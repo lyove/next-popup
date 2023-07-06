@@ -18,4 +18,6 @@ tsconfig.node.json
 vite.config.ts
 vite.lib.config.ts
 dts-bundle-generator.config.ts
-TODO.md
+
+# assets
+public

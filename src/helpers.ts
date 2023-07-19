@@ -401,18 +401,18 @@ export function getScrollElements(el: HTMLElement, container: HTMLElement) {
   return scrollElements;
 }
 
-export function isElClipped(element: Element) {
+export function isElementClipped(element: Element) {
   const { overflow, overflowX, overflowY } = window.getComputedStyle(element);
   const o = overflow + overflowY + overflowX;
   return o.includes("hidden") || o.includes("clip");
 }
 
-export function showDom(el: HTMLElement) {
+export function showDomElement(el: HTMLElement) {
   const { style } = el;
   style.opacity = style.pointerEvents = "";
 }
 
-export function hideDom(el: HTMLElement) {
+export function hideDomElement(el: HTMLElement) {
   const { style } = el;
   style.opacity = "0";
   style.pointerEvents = "none";

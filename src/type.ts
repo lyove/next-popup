@@ -15,7 +15,7 @@ export interface PopoverConfig {
   closeDelay?: number;
   open?: boolean;
   disabled?: boolean;
-  dragEl?: HTMLElement;
+  dragElement?: HTMLElement;
   enterable?: boolean;
   translate?: number[];
   autoPlacement?: boolean;
@@ -26,7 +26,7 @@ export interface PopoverConfig {
   coverTrigger?: boolean;
   closeOnScroll?: boolean;
   hideOnInvisible?: boolean;
-  useTriggerPos?: boolean;
+  useTriggerPosition?: boolean;
   closeAni?: boolean;
   onBeforeEnter?: () => void;
   onEntered?: () => void;

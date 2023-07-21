@@ -1,9 +1,9 @@
 import type { EmitType, PLACEMENT } from "./constant";
 
 export interface PopoverConfig {
-  container?: HTMLElement;
-  trigger: { getBoundingClientRect: () => Rect } | Element;
+  trigger: Element | { getBoundingClientRect: () => Rect };
   content: Node;
+  mountContainer?: HTMLElement;
   triggerOpenClass?: string;
   wrapperClass?: string;
   placement?: PLACEMENT;
@@ -27,7 +27,7 @@ export interface PopoverConfig {
   closeOnScroll?: boolean;
   hideOnInvisible?: boolean;
   useTriggerPosition?: boolean;
-  closeAni?: boolean;
+  closeAnimation?: boolean;
   onBeforeEnter?: () => void;
   onEntered?: () => void;
   onBeforeExit?: () => void;

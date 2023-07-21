@@ -25,7 +25,7 @@ or via CDN
 ```js
 import Popover, { PLACEMENT, EmitType } from 'next-popover'
 
-const container = document.querySelector('.container'); // default: document.body
+const mountContainer = document.querySelector('.mount-container'); // default: document.body
 const trigger = document.querySelector('.trigger'); 
 
 const content = document.createElement('div'); // You need to pop up the displayed content
@@ -33,7 +33,7 @@ content.classList.add('content');
 content.innerHTML = "Hello Next-Popover";
 
 const popover = new Popover({
-  container,
+  mountContainer,
   trigger, // required
   content, // required
   placement: PLACEMENT.T, // Set the position of the popover
@@ -132,7 +132,7 @@ The hideOnInvisible parameter controls whether the popover automatically hides w
 
 ### AutoUpdate
 
-The autoUpdate parameter controls whether the popover's position is automatically updated when the size of the container, content, or trigger element changes. This feature relies on the [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
+The autoUpdate parameter controls whether the popover's position is automatically updated when the size of the mount container, content, or trigger element changes. This feature relies on the [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
 
 The autoPlacement parameter controls whether the popover's position is automatically adjusted to ensure that it is fully displayed when there is not enough space.
 
@@ -199,15 +199,15 @@ canvas.on('scroll', () => popover.onScroll());
 
 | Name | Type | Default | Description |
 | -- | -- | -- | -- |
-| `container` | `HTMLElement` | `document.body` | The container of the popover. |
-| `content` | `Element` | | Required. The content element to be popped up |
-| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | Required. The trigger element |
+| `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `Required`. The trigger element |
+| `content` | `Element` | | `Required`. The content element to be popped up |
+| `mountContainer` | `HTMLElement` | `document.body` | Mount container for popover. |
 | `showArrow` | `Boolean` | `true` | Whether to show arrow |
 | `arrow` | `Element` | | The arrow element. |
 | `placement` | `PLACEMENT` | `PLACEMENT.T` | The placement of the popover. |
 | `translate` | `[number, number]` | `[0, 0]` | The custom xy offset. |
 | `autoPlacement` | `boolean` | `true` | Whether to automatically switch the position when there is not enough space. |
-| `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the container, content, or trigger size changes. |
+| `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the mount container, content, or trigger size changes. |
 | `autoScroll` | `boolean` | `true` | Whether to automatically follow the trigger element when it is scrolled. |
 | `cssName` | `string` | | The CSS animation class name. |
 | `emit` | `EmitType` |  | Trigger emit type |
@@ -218,12 +218,12 @@ canvas.on('scroll', () => popover.onScroll());
 | `disabled` | `boolean` | | Disabled |
 | `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popover is opened. |
 | `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popover |
-| `overflowHidden` | `boolean` | automatically detected | Whether the container has overflow hidden. |
+| `overflowHidden` | `boolean` | automatically detected | Whether the mount container has overflow hidden. |
 | `coverTrigger` | `boolean` | | Whether to cover the trigger element with the popover. |
 | `closeOnScroll` | `boolean` | | Whether to automatically close the popover when the trigger element is scrolled. |
 | `hideOnInvisible` | `boolean` | | Whether to automatically hide the popover when the trigger element is invisible on the screen. |
 | `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popover coordinates | 
-| `closeAni` | `boolean` | `true` | Whether to animate when closing |
+| `closeAnimation` | `boolean` | `true` | Whether to animate when closing |
 | `dragEl` | `HTMLElement` | | The DOM element used to drag the popover position |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |

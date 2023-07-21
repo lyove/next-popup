@@ -26,7 +26,7 @@ npm i next-popover
 ```js
 import Popover, { PLACEMENT, EmitType } from 'next-popover'
 
-const container = document.querySelector('.container'); // 默认: document.body
+const mountContainer = document.querySelector('.mount-container'); // 默认: document.body
 const trigger = document.querySelector('.trigger'); 
 
 const content = document.createElement('div'); // 需要弹出显示的内容
@@ -34,7 +34,7 @@ content.classList.add('content');
 content.innerHTML = "Hello Next-Popover";
 
 const popover = new Popover({
-  container,
+  mountContainer,
   trigger, // 必填
   content, // 必填
   placement: PLACEMENT.T, // 设置弹框位置
@@ -200,9 +200,9 @@ canvas.on('scroll', () => popover.onScroll());
 
 | 参数 | 类型 | 默认 | 描述 |
 | -- | -- | -- | -- |
-| `container` | `HTMLElement` | `document.body` | 弹出层的容器 |
-| `content` | `Element` | | 必填，要弹出的内容元素 |
-| `trigger` | `{ getBoundingClientRect: () => Rect } \| Element` | | 必填，触发元素 |
+| `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `必需`，触发元素 |
+| `content` | `Element` | | `必需`，要弹出的内容元素 |
+| `mountContainer` | `HTMLElement` | `document.body` | 弹出层的挂载容器 |
 | `showArrow` | `Boolean` | `true` | 是否显示箭头元素 |
 | `arrow` | `Element` | | 箭头元素 |
 | `placement` | `PLACEMENT` | `PLACEMENT.T` | 弹出层的位置 |
@@ -224,7 +224,7 @@ canvas.on('scroll', () => popover.onScroll());
 | `closeOnScroll` | `boolean` | | 是否在滚动时自动关闭 |
 | `hideOnInvisible` | `boolean` | | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 |
 | `useTriggerPos` | `boolean` | | 使用 `trigger` 参数返回的 `left` 和 `top` 作为弹框坐标 |
-| `closeAni` | `boolean` | `true` | 是否需要关闭动画 |
+| `closeAnimation` | `boolean` | `true` | 是否需要关闭动画 |
 | `dragEl` | `HTMLElement` | | 用于拖拽弹窗的 DOM 元素 |
 | `onBeforeEnter` | `() => void` | | css 进入动画开始之前 |
 | `onEntered` | `() => void` | | css 进入动画完成时 |

@@ -1,7 +1,7 @@
 import Popover, { createArrow, PLACEMENT, EmitType } from "../src";
 
 window.onload = function () {
-  const mountedElement = document.querySelector(".mounted-container")! as HTMLElement;
+  const mountElement = document.querySelector(".mount-container")! as HTMLElement;
   const scrollBox = document.querySelector(".scroll-box")! as HTMLElement;
   const trigger = document.querySelector("#trigger")! as HTMLElement;
   const content = document.createElement("div");
@@ -14,18 +14,19 @@ window.onload = function () {
     },
   });
 
-  const mountedRect = mountedElement.getBoundingClientRect();
+  const mountedRect = mountElement.getBoundingClientRect();
   scrollBox.scrollTop = (1000 - mountedRect.height) / 2 + 10;
   scrollBox.scrollLeft = (2000 - mountedRect.width) / 2 + 10;
 
   // default
   const config = {
-    container: mountedElement,
+    mountContainer: mountElement,
     content,
     trigger: trigger,
     wrapperClass: "test-popover",
     showArrow: true,
     arrow,
+    // useTriggerPosition: true,
     autoPlacement: true,
     autoUpdate: true,
     autoScroll: true,

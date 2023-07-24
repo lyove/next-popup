@@ -55,7 +55,7 @@ window.onload = function () {
   const configure = document.querySelector(".configure") as HTMLElement;
   configure.onchange = ({ target }) => {
     const { name, value, checked } = target as any;
-    if (name === "setting") {
+    if (name === "extra") {
       if (value === "showArrow" && !checked) {
         const inputArr = document.querySelector("input[value='arrow']") as HTMLInputElement;
         inputArr.checked = false;

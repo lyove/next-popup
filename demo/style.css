@@ -111,6 +111,7 @@ header span {
 /* Description */
 .description {
   margin-bottom: 16px;
+  text-align: center;
 }
 
 .description .tagline {
@@ -120,6 +121,7 @@ header span {
 .description .btn-row {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .description .btn {

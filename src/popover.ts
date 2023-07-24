@@ -697,7 +697,7 @@ export default class Popover {
     const style = arrowEl.style;
     style.position = "absolute";
     style.left = style.top = "0";
-    style.zIndex = "-1";
+    // style.zIndex = "-1";
     return arrowEl;
   }
 

@@ -15,9 +15,11 @@ npm i next-popover
 或者通过 CDN 使用
 
 ```html
-<script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
+<script src="https://unpkg.com/next-popover@latest/dist/popover.iife.js"></script>
 <script>
-  console.log(popover);
+  new NextPopover({
+    // config
+  });
 </script>
 ```
 

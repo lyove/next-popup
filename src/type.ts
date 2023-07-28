@@ -32,14 +32,14 @@ export interface PopoverConfig {
   onEntered?: () => void;
   onBeforeExit?: () => void;
   onExited?: () => void;
-  onBeforePosition?: (pos: Position) => void;
+  onBeforePosition?: (position: Position) => void;
   onOpen?: () => void;
   onClose?: () => void;
   onClickOutside?: () => void;
 }
 
 export interface Position {
-  position: PLACEMENT;
+  placement: PLACEMENT;
   xy?: number[];
   arrowXY?: number[];
 }

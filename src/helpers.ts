@@ -2,17 +2,17 @@ import type { Position, Rect, TransitionInfo } from "./type";
 import { PLACEMENT } from "./constant";
 
 function getPopoverOffset({
-  position,
+  placement,
   triggerRect,
   popoverRect,
   translate,
 }: {
-  position: PLACEMENT;
+  placement: PLACEMENT;
   triggerRect: Rect;
   popoverRect: Rect;
   translate: number[];
 }) {
-  switch (position) {
+  switch (placement) {
     case PLACEMENT.T:
       return [
         triggerRect.left + triggerRect.width / 2 - popoverRect.width / 2 + translate[0],
@@ -66,8 +66,8 @@ function getPopoverOffset({
   }
 }
 
-function getBoundaryPosition(position: PLACEMENT) {
-  switch (position) {
+function getBoundaryPlacement(placement: PLACEMENT) {
+  switch (placement) {
     case PLACEMENT.T:
     case PLACEMENT.TL:
     case PLACEMENT.TR:
@@ -89,13 +89,13 @@ function getBoundaryPosition(position: PLACEMENT) {
   }
 }
 
-function changePosition(
-  position: PLACEMENT,
-  direction: ReturnType<typeof getBoundaryPosition>,
+function changePlacement(
+  placement: PLACEMENT, // t,tl,tr,b,bl,br,l,lt,lb,r,rt,rb
+  direction: ReturnType<typeof getBoundaryPlacement>, // only: left, top, right, bottom
 ): PLACEMENT {
   switch (direction) {
     case PLACEMENT.T:
-      switch (position) {
+      switch (placement) {
         case PLACEMENT.B:
           return PLACEMENT.T;
         case PLACEMENT.BL:
@@ -103,10 +103,10 @@ function changePosition(
         case PLACEMENT.BR:
           return PLACEMENT.TR;
         default:
-          return position;
+          return placement;
       }
     case PLACEMENT.B:
-      switch (position) {
+      switch (placement) {
         case PLACEMENT.T:
           return PLACEMENT.B;
         case PLACEMENT.TL:
@@ -114,10 +114,10 @@ function changePosition(
         case PLACEMENT.TR:
           return PLACEMENT.BR;
         default:
-          return position;
+          return placement;
       }
     case PLACEMENT.L:
-      switch (position) {
+      switch (placement) {
         case PLACEMENT.R:
           return PLACEMENT.L;
         case PLACEMENT.RT:
@@ -125,10 +125,10 @@ function changePosition(
         case PLACEMENT.RB:
           return PLACEMENT.LB;
         default:
-          return position;
+          return placement;
       }
     case PLACEMENT.R:
-      switch (position) {
+      switch (placement) {
         case PLACEMENT.L:
           return PLACEMENT.R;
         case PLACEMENT.LT:
@@ -136,24 +136,24 @@ function changePosition(
         case PLACEMENT.LB:
           return PLACEMENT.RB;
         default:
-          return position;
+          return placement;
       }
     default:
-      return position;
+      return placement;
   }
 }
 
-function getFitPosition({
-  position,
+function getFitPlacement({
+  placement, // t,tl,tr,b,bl,br,l,lt,lb,r,rt,rb
   popoverPosition,
   triggerRect,
   popoverRect,
   mountContainerRect,
   translate,
-  direction,
+  direction, // only: left, top, right, bottom
   overflow,
 }: {
-  position: PLACEMENT;
+  placement: PLACEMENT;
   popoverPosition: number[];
   triggerRect: Rect;
   popoverRect: Rect;
@@ -167,138 +167,145 @@ function getFitPosition({
     document.documentElement.clientHeight || window.innerHeight,
   ];
 
-  const boundary = [
-    overflow ? Math.max(mountContainerRect.left, 0) : 0,
-    overflow ? Math.max(mountContainerRect.top, 0) : 0,
-    overflow
-      ? Math.min(mountContainerRect.left + mountContainerRect.width, viewPortSize[0])
-      : viewPortSize[0],
-    overflow
-      ? Math.min(mountContainerRect.top + mountContainerRect.height, viewPortSize[1])
-      : viewPortSize[1],
-  ];
-  const x = mountContainerRect.left + popoverPosition[0];
-  const y = mountContainerRect.top + popoverPosition[1];
-  const popRect = [
-    mountContainerRect.left + popoverPosition[0],
-    mountContainerRect.top + popoverPosition[1],
-    x + popoverRect.width,
-    y + popoverRect.height,
-  ];
-  const triggerX = mountContainerRect.left + triggerRect.left;
-  const triggerY = mountContainerRect.top + triggerRect.top;
-  const triggerEx = triggerX + triggerRect.width;
-  const triggerEy = triggerY + triggerRect.height;
-  let finalPosition = position;
+  // boundary rect
+  const boundaryLeft = overflow ? Math.max(mountContainerRect.left, 0) : 0;
+  const boundaryTop = overflow ? Math.max(mountContainerRect.top, 0) : 0;
+  const boundaryRight = overflow
+    ? Math.min(mountContainerRect.left + mountContainerRect.width, viewPortSize[0])
+    : viewPortSize[0];
+  const boundaryBottom = overflow
+    ? Math.min(mountContainerRect.top + mountContainerRect.height, viewPortSize[1])
+    : viewPortSize[1];
+  const boundary = [boundaryLeft, boundaryTop, boundaryRight, boundaryBottom];
+
+  // popover rect
+  const popLeft = mountContainerRect.left + popoverPosition[0];
+  const popTop = mountContainerRect.top + popoverPosition[1];
+  const popRight = popLeft + popoverRect.width;
+  const popBottom = popTop + popoverRect.height;
+  const popRect = [popLeft, popTop, popRight, popBottom];
+
+  // trigger rect
+  const triggerLeft = mountContainerRect.left + triggerRect.left;
+  const triggerTop = mountContainerRect.top + triggerRect.top;
+  const triggerRight = triggerLeft + triggerRect.width;
+  const triggerBottom = triggerTop + triggerRect.height;
+
+  let finalPlacement = placement;
+  const newPopoverPosition = [...popoverPosition];
+
   if (direction === PLACEMENT.T) {
-    if (y < boundary[1]) {
+    if (popTop < boundaryTop) {
       if (
-        boundary[3] - triggerEy + translate[1] >= popoverRect.height &&
-        triggerEy - translate[1] >= boundary[1]
+        boundaryBottom - triggerBottom + translate[1] >= popoverRect.height &&
+        triggerBottom - translate[1] >= boundaryTop
       ) {
-        popoverPosition[1] = getPopoverOffset({
-          position: PLACEMENT.B,
+        newPopoverPosition[1] = getPopoverOffset({
+          placement: PLACEMENT.B,
           triggerRect: triggerRect,
           popoverRect,
           translate: [translate[0], -translate[1]],
         })[1];
-        finalPosition = changePosition(position, PLACEMENT.B);
+        finalPlacement = changePlacement(placement, PLACEMENT.B);
       } else {
-        popoverPosition[1] = overflow ? 0 : -mountContainerRect.top;
+        newPopoverPosition[1] = overflow ? 0 : -mountContainerRect.top;
       }
-    } else if (popRect[3] > boundary[3]) {
-      popoverPosition[1] = overflow
+    } else if (popBottom > boundaryBottom) {
+      newPopoverPosition[1] = overflow
         ? mountContainerRect.height - popoverRect.height
         : viewPortSize[1] - mountContainerRect.top - popoverRect.height;
     }
   } else if (direction === PLACEMENT.B) {
-    if (popRect[3] > boundary[3]) {
+    if (popBottom > boundaryBottom) {
       if (
-        triggerY - boundary[1] - translate[1] >= popoverRect.height &&
-        triggerY - translate[1] <= boundary[3]
+        triggerTop - boundaryTop - translate[1] >= popoverRect.height &&
+        triggerTop - translate[1] <= boundaryBottom
       ) {
-        popoverPosition[1] = getPopoverOffset({
-          position: PLACEMENT.T,
+        newPopoverPosition[1] = getPopoverOffset({
+          placement: PLACEMENT.T,
           triggerRect,
           popoverRect,
           translate: [translate[0], -translate[1]],
         })[1];
-        finalPosition = changePosition(position, PLACEMENT.T);
+        finalPlacement = changePlacement(placement, PLACEMENT.T);
       } else {
-        popoverPosition[1] = overflow
+        newPopoverPosition[1] = overflow
           ? mountContainerRect.height - popoverRect.height
           : viewPortSize[1] - mountContainerRect.top - popoverRect.height;
       }
-    } else if (y < boundary[1]) {
-      popoverPosition[1] = overflow ? 0 : -mountContainerRect.top;
+    } else if (popTop < boundaryTop) {
+      newPopoverPosition[1] = overflow ? 0 : -mountContainerRect.top;
     }
   } else if (direction === PLACEMENT.L) {
-    if (x < boundary[0]) {
+    if (popLeft < boundaryLeft) {
       if (
-        boundary[2] - triggerEx + translate[0] >= popoverRect.width &&
-        triggerEx - translate[0] >= boundary[0]
+        boundaryRight - triggerRight + translate[0] >= popoverRect.width &&
+        triggerRight - translate[0] >= boundaryLeft
       ) {
-        finalPosition = changePosition(position, PLACEMENT.R);
-        popoverPosition[0] = getPopoverOffset({
-          position: PLACEMENT.R,
+        finalPlacement = changePlacement(placement, PLACEMENT.R);
+        newPopoverPosition[0] = getPopoverOffset({
+          placement: PLACEMENT.R,
           triggerRect,
           popoverRect,
           translate: [translate[0], -translate[1]],
         })[0];
       } else {
-        popoverPosition[0] = overflow ? 0 : -mountContainerRect.left;
+        newPopoverPosition[0] = overflow ? 0 : -mountContainerRect.left;
       }
-    } else if (popRect[2] > boundary[2]) {
-      popoverPosition[0] = overflow
+    } else if (popRight > boundaryRight) {
+      newPopoverPosition[0] = overflow
         ? mountContainerRect.width - popoverRect.width
         : viewPortSize[0] - mountContainerRect.left + popoverRect.width;
     }
   } else if (direction === PLACEMENT.R) {
-    if (popRect[2] > boundary[2]) {
+    if (popRight > boundaryRight) {
       if (
-        triggerX - boundary[0] - translate[0] >= popoverRect.width &&
-        triggerX - translate[0] <= boundary[2]
+        triggerLeft - boundaryLeft - translate[0] >= popoverRect.width &&
+        triggerLeft - translate[0] <= boundaryRight
       ) {
-        finalPosition = changePosition(position, PLACEMENT.L);
-        popoverPosition[0] = getPopoverOffset({
-          position: PLACEMENT.L,
+        finalPlacement = changePlacement(placement, PLACEMENT.L);
+        newPopoverPosition[0] = getPopoverOffset({
+          placement: PLACEMENT.L,
           triggerRect,
           popoverRect,
           translate: [translate[0], -translate[1]],
         })[0];
       } else {
-        popoverPosition[0] = overflow
+        newPopoverPosition[0] = overflow
           ? mountContainerRect.width - popoverRect.width
           : viewPortSize[0] - mountContainerRect.left + popoverRect.width;
       }
-    } else if (x < boundary[0]) {
-      popoverPosition[0] = overflow ? 0 : -mountContainerRect.left;
+    } else if (popLeft < boundaryLeft) {
+      newPopoverPosition[0] = overflow ? 0 : -mountContainerRect.left;
     }
   }
 
   if (direction === PLACEMENT.T || direction === PLACEMENT.B) {
-    if (x < boundary[0]) {
-      popoverPosition[0] = overflow ? 0 : -mountContainerRect.left;
-    } else if (popRect[2] > boundary[2]) {
-      popoverPosition[0] = overflow
+    if (popLeft < boundaryLeft) {
+      newPopoverPosition[0] = overflow ? 0 : -mountContainerRect.left;
+    } else if (popRight > boundaryRight) {
+      newPopoverPosition[0] = overflow
         ? mountContainerRect.width - popoverRect.width
         : viewPortSize[0] - mountContainerRect.left + popoverRect.width;
     }
   } else if (direction === PLACEMENT.L || direction === PLACEMENT.R) {
-    if (y < boundary[1]) {
-      popoverPosition[1] = overflow ? 0 : -mountContainerRect.top;
-    } else if (popRect[3] > boundary[3]) {
-      popoverPosition[1] = overflow
+    if (popTop < boundaryTop) {
+      newPopoverPosition[1] = overflow ? 0 : -mountContainerRect.top;
+    } else if (popBottom > boundaryBottom) {
+      newPopoverPosition[1] = overflow
         ? mountContainerRect.height - popoverRect.height
         : viewPortSize[1] - mountContainerRect.top - popoverRect.height;
     }
   }
 
-  return finalPosition;
+  return {
+    placement: finalPlacement,
+    popoverPosition: newPopoverPosition,
+  };
 }
 
 export function getPopoverStyle({
-  position,
+  placement,
   triggerRect,
   popoverRect,
   arrowRect,
@@ -309,7 +316,7 @@ export function getPopoverStyle({
   hideOnInvisible,
   overflow,
 }: {
-  position: PLACEMENT;
+  placement: PLACEMENT;
   triggerRect: Rect;
   popoverRect: Rect;
   arrowRect?: Rect;
@@ -327,59 +334,65 @@ export function getPopoverStyle({
     triggerRect.top + triggerRect.height <= 0;
 
   if (hideOnInvisible && triggerOut) {
-    return { position };
+    return { placement };
   }
 
-  let direction = getBoundaryPosition(position);
+  let direction = getBoundaryPlacement(placement);
+  const newTranslate = [...translate];
+
   if (coverTrigger) {
-    translate = [...translate];
     if (direction === PLACEMENT.T) {
-      translate[1] += triggerRect.height;
+      newTranslate[1] += triggerRect.height;
     } else if (direction === PLACEMENT.B) {
-      translate[1] -= triggerRect.height;
+      newTranslate[1] -= triggerRect.height;
     } else if (direction === PLACEMENT.L) {
-      translate[0] += triggerRect.width;
+      newTranslate[0] += triggerRect.width;
     } else {
-      translate[0] -= triggerRect.width;
+      newTranslate[0] -= triggerRect.width;
     }
   }
 
   const popoverPosition = getPopoverOffset({
-    position,
+    placement,
     triggerRect,
     popoverRect,
-    translate,
+    translate: newTranslate,
   });
 
+  let newPlacement = placement;
+  let newPopoverPosition = popoverPosition;
+
   if (autoFit) {
-    position = getFitPosition({
-      position,
+    const fitPlacementPosition = getFitPlacement({
+      placement,
       popoverPosition,
       triggerRect,
       popoverRect,
       mountContainerRect,
-      translate,
+      translate: newTranslate,
       direction,
       overflow,
     });
+    newPlacement = fitPlacementPosition.placement;
+    newPopoverPosition = fitPlacementPosition.popoverPosition;
   }
 
   let arrowXY: undefined | number[];
   if (!triggerOut && arrowRect) {
-    direction = getBoundaryPosition(position);
+    direction = getBoundaryPlacement(newPlacement);
     arrowXY = [];
     const half = [arrowRect.width / 2, arrowRect.height / 2];
     const isL = direction === PLACEMENT.L;
     const isR = direction === PLACEMENT.R;
     if (isL || isR) {
-      arrowXY[1] = triggerRect.top + triggerRect.height / 2 - popoverPosition[1] - half[1];
+      arrowXY[1] = triggerRect.top + triggerRect.height / 2 - newPopoverPosition[1] - half[1];
       if (arrowXY[1] < half[1] || arrowXY[1] > popoverRect.height - arrowRect.height - half[1]) {
         arrowXY = undefined;
       } else {
         arrowXY[0] = (isL ? popoverRect.width : 0) - half[0];
       }
     } else {
-      arrowXY[0] = triggerRect.left + triggerRect.width / 2 - popoverPosition[0] - half[0];
+      arrowXY[0] = triggerRect.left + triggerRect.width / 2 - newPopoverPosition[0] - half[0];
       if (arrowXY[0] < half[0] || arrowXY[0] > popoverRect.width - arrowRect.width - half[0]) {
         arrowXY = undefined;
       } else {
@@ -389,14 +402,14 @@ export function getPopoverStyle({
   }
 
   return {
-    xy: popoverPosition,
+    xy: newPopoverPosition,
     arrowXY,
-    position,
+    placement: newPlacement,
   };
 }
 
-export function getTransitionInfo(el: Element): TransitionInfo {
-  const styles = window.getComputedStyle(el);
+export function getTransitionInfo(element: Element): TransitionInfo {
+  const styles = window.getComputedStyle(element);
   const getStyleProperties = (key: keyof typeof styles) => ((styles[key] || "") as any).split(", ");
   const getTimeout = (delays: string[], durations: string[]): number => {
     const toMs = (s: string): number => {
@@ -427,27 +440,28 @@ export function getTransitionInfo(el: Element): TransitionInfo {
   };
 }
 
-export function getScrollElements(el: HTMLElement, mountContainer: HTMLElement) {
+export function getScrollElements(element: HTMLElement, mountContainer: HTMLElement) {
   const scrollElements: HTMLElement[] = [];
-  const isScrollElement = (element: HTMLElement) => {
-    return element.scrollHeight > element.offsetHeight || element.scrollWidth > element.offsetWidth;
+  const isScrollElement = (el: HTMLElement) => {
+    return el.scrollHeight > el.offsetHeight || el.scrollWidth > el.offsetWidth;
   };
-  while (el && el !== mountContainer) {
-    if (isScrollElement(el)) {
-      scrollElements.push(el);
+  while (element && element !== mountContainer) {
+    if (isScrollElement(element)) {
+      scrollElements.push(element);
     }
-    el = el.parentElement!;
+    element = element.parentElement!;
   }
   return scrollElements;
 }
 
-export function showDomElement(el: HTMLElement) {
-  const { style } = el;
-  style.opacity = style.pointerEvents = "";
+export function showDomElement(element: HTMLElement) {
+  const { style } = element;
+  style.opacity = "1";
+  style.pointerEvents = "auto";
 }
 
-export function hideDomElement(el: HTMLElement) {
-  const { style } = el;
+export function hideDomElement(element: HTMLElement) {
+  const { style } = element;
   style.opacity = "0";
   style.pointerEvents = "none";
 }

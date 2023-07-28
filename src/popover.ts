@@ -64,7 +64,7 @@ export default class Popover {
     autoUpdate: true,
     autoScroll: true,
     cssName: "fade",
-    translate: [0, -10],
+    translate: [0, 0],
     clickOutsideClose: true,
     closeAnimation: true,
     enterable: true,
@@ -213,7 +213,7 @@ export default class Popover {
 
     this.opened = true;
 
-    let triggerRect = config.trigger.getBoundingClientRect() as Rect;
+    let triggerRect = config.trigger.getBoundingClientRect();
     const popWrapRect = this.popoverWrapper.getBoundingClientRect();
     const mountContainerRect = (config.mountContainer || document.body).getBoundingClientRect();
     const arrowRect = this.arrowElement?.getBoundingClientRect();
@@ -253,13 +253,13 @@ export default class Popover {
       });
     }
 
-    const ret = config.useTriggerPosition
+    const position = config.useTriggerPosition
       ? {
           xy: [triggerRect.left, triggerRect.top],
-          position: config.placement!,
+          placement: config.placement!,
         }
       : getPopoverStyle({
-          position: config.placement!,
+          placement: config.placement!,
           triggerRect: triggerRect,
           popoverRect: popWrapRect,
           arrowRect: arrowRect,
@@ -272,18 +272,18 @@ export default class Popover {
         });
 
     if (config.onBeforePosition) {
-      config.onBeforePosition(ret);
+      config.onBeforePosition(position);
     }
 
-    if (this.#cssName && ret.position !== this.#prevPlacement) {
+    if (this.#cssName && position.placement !== this.#prevPlacement) {
       if (this.#prevPlacement) {
         this.popoverWrapper.classList.remove(`${config.cssName}-${this.#prevPlacement}`);
       }
-      this.#prevPlacement = ret.position;
-      this.popoverWrapper.classList.add(`${config.cssName}-${ret.position}`);
+      this.#prevPlacement = position.placement;
+      this.popoverWrapper.classList.add(`${config.cssName}-${position.placement}`);
     }
 
-    const { xy } = ret;
+    const { xy, arrowXY } = position;
     if (xy) {
       if (this.#popHide) {
         this.#popHide = false;
@@ -317,12 +317,12 @@ export default class Popover {
       this.#popHide = true;
     }
     if (this.arrowElement) {
-      if (ret.arrowXY) {
+      if (arrowXY) {
         if (this.#arrowHide) {
           this.#arrowHide = false;
           showDomElement(this.arrowElement);
         }
-        this.arrowElement.style.transform = `translate(${ret.arrowXY[0]}px,${ret.arrowXY[1]}px)`;
+        this.arrowElement.style.transform = `translate(${arrowXY[0]}px,${arrowXY[1]}px)`;
       } else if (!this.#arrowHide) {
         this.#arrowHide = true;
         hideDomElement(this.arrowElement);

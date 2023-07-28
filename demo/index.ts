@@ -30,7 +30,7 @@ window.onload = function () {
     autoPlacement: true,
     autoUpdate: true,
     autoScroll: true,
-    translate: [0, -10],
+    translate: [0, 0],
     cssName: "fade",
     placement: PLACEMENT.T,
     openDelay: 0,

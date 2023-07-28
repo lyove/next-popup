@@ -89,6 +89,10 @@ header span {
   margin-bottom: 10px;
 }
 
+.nav-vertical .placement label {
+  width: 110px;
+}
+
 .nav-vertical label input {
   margin: 0 5px;
 }

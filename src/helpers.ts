@@ -327,13 +327,13 @@ export function getPopoverStyle({
   hideOnInvisible?: boolean;
   overflow?: boolean;
 }): Position {
-  const triggerOut =
+  const triggerIsOutOfRange =
     triggerRect.left >= mountContainerRect.width ||
     triggerRect.top >= mountContainerRect.height ||
     triggerRect.left + triggerRect.width <= 0 ||
     triggerRect.top + triggerRect.height <= 0;
 
-  if (hideOnInvisible && triggerOut) {
+  if (hideOnInvisible && triggerIsOutOfRange) {
     return { placement };
   }
 
@@ -378,7 +378,7 @@ export function getPopoverStyle({
   }
 
   let arrowXY: undefined | number[];
-  if (!triggerOut && arrowRect) {
+  if (!triggerIsOutOfRange && arrowRect) {
     direction = getBoundaryPlacement(newPlacement);
     arrowXY = [];
     const half = [arrowRect.width / 2, arrowRect.height / 2];

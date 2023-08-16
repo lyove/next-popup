@@ -213,7 +213,7 @@ export default class Popover {
 
     this.opened = true;
 
-    let triggerRect = config.trigger.getBoundingClientRect();
+    let triggerRect = config.trigger.getBoundingClientRect() as Rect;
     const popWrapRect = this.popoverWrapper.getBoundingClientRect();
     const mountContainerRect = (config.mountContainer || document.body).getBoundingClientRect();
     const arrowRect = this.arrowElement?.getBoundingClientRect();

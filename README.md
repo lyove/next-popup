@@ -58,24 +58,24 @@ popover.destroy();
 
 ### CSS Animation
 
-The cssName parameter allows you to add CSS animations when showing and hiding the popover.
+The animationClass parameter allows you to add CSS animations when showing and hiding the popover.
 
 ```js
 const popover = new Popover({
-  cssName: 'fade'
+  animationClass: 'fade'
 });
 ```
 
-Popover will add the following 6 classes through the cssName.
+Popover will add the following 6 classes through the animationClass.
 
 ```js
-`${cssName}-enter-from` // Starts displaying and is removed in the next frame.
-`${cssName}-enter-active` // Added in the next frame and removed when the animation ends.
-`${cssName}-enter-to` // Added in the next frame and removed when the animation ends.
-`${cssName}-exit-from` // Starts hiding and is removed in the next frame.
-`${cssName}-exit-active` // Added in the next frame and removed when the animation ends.
-`${cssName}-exit-to` // Added in the next frame and removed when the animation ends.
-`${cssName}-${PLACEMENT}` // Current popover placement
+`${animationClass}-enter-from` // Starts displaying and is removed in the next frame.
+`${animationClass}-enter-active` // Added in the next frame and removed when the animation ends.
+`${animationClass}-enter-to` // Added in the next frame and removed when the animation ends.
+`${animationClass}-exit-from` // Starts hiding and is removed in the next frame.
+`${animationClass}-exit-active` // Added in the next frame and removed when the animation ends.
+`${animationClass}-exit-to` // Added in the next frame and removed when the animation ends.
+`${animationClass}-${PLACEMENT}` // Current popover placement
 ```
 
 You can write CSS styles like this:
@@ -156,14 +156,18 @@ new Popover({
   onExited() {
     // Executed after the CSS hide animation completes.
   },
-  onBeforePosition(pos) {
+  onBeforePosition(positionXY) {
     // Executed before setting the popover's position.
-    // pos.position: the final display position.
-    // pos.xy: the position of the popover, undefined means not displayed.
-    // pos.arrowXY: the position of the arrow, undefined means not displayed.
+    // positionXY.position: the final display position.
+    // positionXY.xy: the position of the popover, undefined means not displayed.
+    // positionXY.arrowXY: the position of the arrow, undefined means not displayed.
     // You can modify xy and arrowXY directly to change the final position.
-    if (pos.xy) pos.xy[0] += 10
-    if (pos.arrowXY) pos.arrowXY[0] += 10
+    if (positionXY.xy) {
+      positionXY.xy[0] += 10;
+    }
+    if (positionXY.arrowXY) {
+      positionXY.arrowXY[0] += 10;
+    }
   },
   onOpen() {
     // Executed when the popover is displayed.
@@ -211,7 +215,7 @@ canvas.on('scroll', () => popover.onScroll());
 | `autoPlacement` | `boolean` | `true` | Whether to automatically switch the position when there is not enough space. |
 | `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the mount container, content, or trigger size changes. |
 | `autoScroll` | `boolean` | `true` | Whether to automatically follow the trigger element when it is scrolled. |
-| `cssName` | `string` | | The CSS animation class name. |
+| `animationClass` | `string` | | The CSS animation class name. |
 | `emit` | `EmitType` |  | Trigger emit type |
 | `clickOutsideClose` | `boolean` | `true` | Automatically close the popover when clicking outside |
 | `openDelay` | `number` | | Open delay |
@@ -226,12 +230,12 @@ canvas.on('scroll', () => popover.onScroll());
 | `hideOnInvisible` | `boolean` | | Whether to automatically hide the popover when the trigger element is invisible on the screen. |
 | `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popover coordinates | 
 | `closeAnimation` | `boolean` | `true` | Whether to animate when closing |
-| `dragEl` | `HTMLElement` | | The DOM element used to drag the popover position |
+| `dragElement` | `HTMLElement` | | The DOM element used to drag the popover position |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
 | `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |
 | `onExited` | `() => void` | | Called when the CSS exit animation ends. |
-| `onBeforePosition` | `(pos: Position) => void` | | Called before setting the position of the popover. You can modify the pos object to set the final position of the popover. |
+| `onBeforePosition` | `(positionXY: PositionXY) => void` | | Called before setting the position of the popover. You can modify the pos object to set the final position of the popover. |
 | `onOpen` | `() => void` | | Called when the popover is opened. |
 | `onClose` | `() => void` | |Called when the popover is closed. |
 | `onClickOutside` | `() => void` | | When the popover is closed. |

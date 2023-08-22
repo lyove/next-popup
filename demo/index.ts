@@ -9,8 +9,8 @@ window.onload = function () {
   const arrow = createArrow({
     class: "custom-arrow",
     style: {
-      width: "14px",
-      height: "14px",
+      width: "12px",
+      height: "12px",
     },
   });
 

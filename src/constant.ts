@@ -1,3 +1,5 @@
+export const NextPopoverId = "next-popover";
+
 export const PopoverWrapperClass = "popover-wrapper";
 
 export const PopoverContentClass = "popover-content";

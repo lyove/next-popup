@@ -21,7 +21,7 @@ export interface PopoverConfig {
   autoPlacement?: boolean;
   autoUpdate?: boolean;
   autoScroll?: boolean;
-  cssName?: string;
+  animationClass?: string;
   overflowHidden?: boolean;
   coverTrigger?: boolean;
   closeOnScroll?: boolean;
@@ -32,21 +32,26 @@ export interface PopoverConfig {
   onEntered?: () => void;
   onBeforeExit?: () => void;
   onExited?: () => void;
-  onBeforePosition?: (position: Position) => void;
+  onBeforePosition?: (positionXY: PositionXY) => void;
   onOpen?: () => void;
   onClose?: () => void;
   onClickOutside?: () => void;
 }
 
-export interface Position {
+export interface PositionXY {
   placement: PLACEMENT;
   xy?: number[];
   arrowXY?: number[];
 }
 
-export type Rect = { left: number; top: number; width: number; height: number };
+export type Rect = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
 
-export interface CssName {
+export interface AnimationClass {
   enterFrom: string;
   enterActive: string;
   enterTo: string;

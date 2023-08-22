@@ -406,7 +406,7 @@ export function getPopoverPositionXY({
 
   const newDirection = getBoundaryPlacement(newPlacement);
 
-  // arrow offset
+  // if show arrow, calculate popover offset
   if (arrowRect) {
     const arrH =
       (Math.sqrt(arrowRect.width * arrowRect.width + arrowRect.height * arrowRect.height) || 0) / 2;

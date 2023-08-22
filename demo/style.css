@@ -224,6 +224,10 @@ header span {
 /**
  * Popover style
  */
+.popover-wrapper.test-popover {
+  position: relative;
+}
+
 /* content */
 .popover-wrapper.test-popover .popover-content {
   width: 100px;

@@ -271,10 +271,10 @@ export default class Popover {
         }
       : getPopoverPositionXY({
           placement: config.placement!,
-          triggerRect: triggerRect,
+          triggerRect,
           popoverRect: popWrapRect,
-          arrowRect: arrowRect,
-          mountContainerRect: mountContainerRect,
+          arrowRect,
+          mountContainerRect,
           translate: config.translate!,
           autoFit: config.autoPlacement!,
           coverTrigger: config.coverTrigger,

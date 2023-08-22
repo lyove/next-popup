@@ -1,13 +1,14 @@
-import type { Rect, PopoverConfig, CssName, TransitionInfo } from "./type";
+import type { Rect, PopoverConfig, AnimationClass, TransitionInfo } from "./type";
 import { $, destroy, throttle, getChangedAttrs, Drag, clamp } from "./utils";
 import {
-  getPopoverStyle,
+  getPopoverPositionXY,
   getTransitionInfo,
   getScrollElements,
   showDomElement,
   hideDomElement,
 } from "./helpers";
 import {
+  NextPopoverId,
   PopoverWrapperClass,
   PopoverContentClass,
   PopoverArrowClass,
@@ -48,6 +49,8 @@ export function createArrow({
 export default class Popover {
   config!: PopoverConfig;
 
+  originalElement!: HTMLElement;
+
   popoverWrapper!: HTMLElement;
 
   arrowElement?: HTMLElement;
@@ -63,7 +66,7 @@ export default class Popover {
     autoPlacement: true,
     autoUpdate: true,
     autoScroll: true,
-    cssName: "fade",
+    animationClass: "fade",
     translate: [0, 0],
     clickOutsideClose: true,
     closeAnimation: true,
@@ -71,11 +74,9 @@ export default class Popover {
     closeDelay: 50,
   };
 
-  #positioningElement!: HTMLElement;
-
   #triggerIsElement!: boolean;
 
-  #cssName?: CssName;
+  #animationClass?: AnimationClass;
 
   #popHide = false;
 
@@ -127,13 +128,17 @@ export default class Popover {
       ...config,
     };
 
-    const { content, mountContainer, trigger, wrapperClass, overflowHidden } = this.config;
+    const { trigger, content, mountContainer, wrapperClass, overflowHidden } = this.config;
+
+    if (!trigger || !content) {
+      throw new Error("Invalid argument");
+    }
 
     this.#triggerIsElement = trigger instanceof Element;
 
     // Positioning Element
-    this.#positioningElement = $();
-    const { style } = this.#positioningElement;
+    this.originalElement = $("div", { id: NextPopoverId });
+    const { style } = this.originalElement;
     style.position = "absolute";
     style.left = style.top = "0";
 
@@ -141,7 +146,7 @@ export default class Popover {
     this.popoverWrapper = $("div", {
       class: `${PopoverWrapperClass}${wrapperClass ? ` ${wrapperClass}` : ""}`,
     });
-    this.#positioningElement.appendChild(this.popoverWrapper);
+    this.originalElement.appendChild(this.popoverWrapper);
 
     // Popover mounted elements
     if (mountContainer && mountContainer !== document.body) {
@@ -178,7 +183,7 @@ export default class Popover {
       );
     }
 
-    this.#setCssName();
+    this.#setAnimationClass();
     this.#addTriggerEvent();
     this.#addEnterEvent();
 
@@ -220,8 +225,14 @@ export default class Popover {
 
     if (this.#triggerIsElement) {
       triggerRect = {
-        left: triggerRect.left - mountContainerRect.left,
-        top: triggerRect.top - mountContainerRect.top,
+        left:
+          config.mountContainer !== document.body
+            ? triggerRect.left - mountContainerRect.left
+            : triggerRect.left,
+        top:
+          config.mountContainer !== document.body
+            ? triggerRect.top - mountContainerRect.top
+            : triggerRect.top,
         width: triggerRect.width,
         height: triggerRect.height,
       };
@@ -231,16 +242,16 @@ export default class Popover {
     }
 
     this.#isAnimating = true;
-    if (fromHide && this.#cssName) {
+    if (fromHide && this.#animationClass) {
       if (config.onBeforeEnter) {
         config.onBeforeEnter();
       }
-      this.popoverWrapper.classList.add(this.#cssName.enterFrom);
+      this.popoverWrapper.classList.add(this.#animationClass.enterFrom);
       this.#showRaf = requestAnimationFrame(() => {
-        this.popoverWrapper.classList.remove(this.#cssName?.enterFrom || "");
+        this.popoverWrapper.classList.remove(this.#animationClass?.enterFrom || "");
         this.popoverWrapper.classList.add(
-          this.#cssName?.enterActive || "",
-          this.#cssName?.enterTo || "",
+          this.#animationClass?.enterActive || "",
+          this.#animationClass?.enterTo || "",
         );
         const transInfo = this.#getTransitionInfo(this.popoverWrapper, this.#showTransInfo);
         this.#showTransInfo = transInfo.info;
@@ -253,12 +264,12 @@ export default class Popover {
       });
     }
 
-    const position = config.useTriggerPosition
+    const positionXY = config.useTriggerPosition
       ? {
           xy: [triggerRect.left, triggerRect.top],
           placement: config.placement!,
         }
-      : getPopoverStyle({
+      : getPopoverPositionXY({
           placement: config.placement!,
           triggerRect: triggerRect,
           popoverRect: popWrapRect,
@@ -272,24 +283,24 @@ export default class Popover {
         });
 
     if (config.onBeforePosition) {
-      config.onBeforePosition(position);
+      config.onBeforePosition(positionXY);
     }
 
-    if (this.#cssName && position.placement !== this.#prevPlacement) {
+    if (this.#animationClass && positionXY.placement !== this.#prevPlacement) {
       if (this.#prevPlacement) {
-        this.popoverWrapper.classList.remove(`${config.cssName}-${this.#prevPlacement}`);
+        this.popoverWrapper.classList.remove(`${config.animationClass}-${this.#prevPlacement}`);
       }
-      this.#prevPlacement = position.placement;
-      this.popoverWrapper.classList.add(`${config.cssName}-${position.placement}`);
+      this.#prevPlacement = positionXY.placement;
+      this.popoverWrapper.classList.add(`${config.animationClass}-${positionXY.placement}`);
     }
 
-    const { xy, arrowXY } = position;
+    const { xy, arrowXY } = positionXY;
     if (xy) {
+      this.originalElement.style.transform = `translate3d(${xy[0]}px,${xy[1]}px,0)`;
       if (this.#popHide) {
         this.#popHide = false;
-        showDomElement(this.#positioningElement);
+        showDomElement(this.originalElement);
       }
-      this.#positioningElement.style.transform = `translate3d(${xy[0]}px,${xy[1]}px,0)`;
       if (fromHide && config.dragElement) {
         const diffXY: number[] = [];
         const curXY: number[] = [];
@@ -304,7 +315,7 @@ export default class Popover {
           (ev: PointerEvent) => {
             curXY[0] = clamp(diffXY[0] + ev.clientX, 0, maxX);
             curXY[1] = clamp(diffXY[1] + ev.clientY, 0, maxY);
-            this.#positioningElement.style.transform = `translate3d(${curXY[0]}px,${curXY[1]}px,0)`;
+            this.originalElement.style.transform = `translate3d(${curXY[0]}px,${curXY[1]}px,0)`;
           },
           () => {
             xy[0] = curXY[0];
@@ -313,7 +324,7 @@ export default class Popover {
         );
       }
     } else if (!this.#popHide) {
-      hideDomElement(this.#positioningElement);
+      hideDomElement(this.originalElement);
       this.#popHide = true;
     }
     if (this.arrowElement) {
@@ -376,18 +387,18 @@ export default class Popover {
 
     this.opened = false;
 
-    if (config.closeAnimation && this.#cssName) {
+    if (config.closeAnimation && this.#animationClass) {
       const { onBeforeExit } = config;
       if (onBeforeExit) {
         onBeforeExit();
       }
-      this.popoverWrapper.classList.add(this.#cssName.exitFrom);
+      this.popoverWrapper.classList.add(this.#animationClass.exitFrom);
       this.#isAnimating = true;
       this.#hideRaf = requestAnimationFrame(() => {
-        this.popoverWrapper.classList.remove(this.#cssName?.exitFrom || "");
+        this.popoverWrapper.classList.remove(this.#animationClass?.exitFrom || "");
         this.popoverWrapper.classList.add(
-          this.#cssName?.exitActive || "",
-          this.#cssName?.exitTo || "",
+          this.#animationClass?.exitActive || "",
+          this.#animationClass?.exitTo || "",
         );
         const transInfo = this.#getTransitionInfo(this.popoverWrapper, this.#hideTransInfo);
         this.#hideTransInfo = transInfo.info;
@@ -585,8 +596,8 @@ export default class Popover {
           }
           break;
 
-        case "cssName":
-          this.#setCssName();
+        case "animationClass":
+          this.#setAnimationClass();
           break;
 
         case "disabled":
@@ -635,7 +646,7 @@ export default class Popover {
     }
     if (this.opened) {
       try {
-        mountContainer!.removeChild(this.#positioningElement);
+        mountContainer!.removeChild(this.originalElement);
       } catch (e) {
         //
       }
@@ -670,24 +681,24 @@ export default class Popover {
 
   #show() {
     const { mountContainer } = this.config;
-    mountContainer!.appendChild(this.#positioningElement);
+    mountContainer!.appendChild(this.originalElement);
   }
 
   #hide() {
     const { mountContainer } = this.config;
-    mountContainer!.removeChild(this.#positioningElement);
+    mountContainer!.removeChild(this.originalElement);
   }
 
-  #setCssName() {
-    const { cssName } = this.config;
-    this.#cssName = cssName
+  #setAnimationClass() {
+    const { animationClass } = this.config;
+    this.#animationClass = animationClass
       ? {
-          enterFrom: `${cssName}-enter-from`,
-          enterActive: `${cssName}-enter-active`,
-          enterTo: `${cssName}-enter-to`,
-          exitFrom: `${cssName}-exit-from`,
-          exitActive: `${cssName}-exit-active`,
-          exitTo: `${cssName}-exit-to`,
+          enterFrom: `${animationClass}-enter-from`,
+          enterActive: `${animationClass}-enter-active`,
+          enterTo: `${animationClass}-enter-to`,
+          exitFrom: `${animationClass}-exit-from`,
+          exitActive: `${animationClass}-exit-active`,
+          exitTo: `${animationClass}-exit-to`,
         }
       : undefined;
   }
@@ -790,14 +801,14 @@ export default class Popover {
   #addEnterEvent() {
     const { config } = this;
     if (config.enterable && config.emit === EmitType.HOVER) {
-      this.#positioningElement.addEventListener("mouseenter", this.#onTriggerEnter);
-      this.#positioningElement.addEventListener("mouseleave", this.#onTriggerLeave);
+      this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
+      this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
     }
   }
 
   #removeEnterEvent() {
-    this.#positioningElement.removeEventListener("mouseenter", this.#onTriggerEnter);
-    this.#positioningElement.removeEventListener("mouseleave", this.#onTriggerLeave);
+    this.originalElement.removeEventListener("mouseenter", this.#onTriggerEnter);
+    this.originalElement.removeEventListener("mouseleave", this.#onTriggerLeave);
   }
 
   #removeEmitEvent(element?: HTMLElement) {
@@ -845,7 +856,10 @@ export default class Popover {
 
   #onShowTransitionEnd = () => {
     const { onEntered } = this.config;
-    this.popoverWrapper.classList.remove(this.#cssName!.enterActive, this.#cssName!.enterTo);
+    this.popoverWrapper.classList.remove(
+      this.#animationClass!.enterActive,
+      this.#animationClass!.enterTo,
+    );
     this.#isAnimating = false;
     if (onEntered) {
       onEntered();
@@ -859,7 +873,10 @@ export default class Popover {
     const { config } = this;
     const { onExited } = config;
     this.#hide();
-    this.popoverWrapper.classList.remove(this.#cssName!.exitActive, this.#cssName!.exitTo);
+    this.popoverWrapper.classList.remove(
+      this.#animationClass!.exitActive,
+      this.#animationClass!.exitTo,
+    );
     this.#isAnimating = false;
     if (onExited) {
       onExited();

@@ -1,9 +1,9 @@
 import Popover, { createArrow, PLACEMENT, EmitType } from "../src";
 
 window.onload = function () {
-  const mountElement = document.querySelector(".mount-container")! as HTMLElement;
-  const scrollBox = document.querySelector(".scroll-box")! as HTMLElement;
-  const trigger = document.querySelector("#trigger")! as HTMLElement;
+  const mountElement = (document.querySelector(".mount-container") || document.body) as HTMLElement;
+  const scrollBox = document.querySelector(".scroll-box") as HTMLElement;
+  const trigger = document.querySelector("#trigger") as HTMLElement;
   const content = document.createElement("div");
   content.innerHTML = "Next-Popover";
   const arrow = createArrow({
@@ -15,8 +15,10 @@ window.onload = function () {
   });
 
   const mountedRect = mountElement.getBoundingClientRect();
-  scrollBox.scrollTop = (1000 - mountedRect.height) / 2 + 10;
-  scrollBox.scrollLeft = (2000 - mountedRect.width) / 2 + 10;
+  if (scrollBox) {
+    scrollBox.scrollTop = (1000 - mountedRect.height) / 2 + 10;
+    scrollBox.scrollLeft = (2000 - mountedRect.width) / 2 + 10;
+  }
 
   // default
   const config = {
@@ -31,7 +33,7 @@ window.onload = function () {
     autoUpdate: true,
     autoScroll: true,
     translate: [0, 0],
-    cssName: "fade",
+    animationClass: "fade",
     placement: PLACEMENT.T,
     openDelay: 0,
     closeDelay: 50,
@@ -63,7 +65,7 @@ window.onload = function () {
       if (value === "arrow") {
         config.arrow = (checked ? arrow : undefined) as any;
       } else if (value === "css") {
-        config.cssName = checked ? "fade" : "";
+        config.animationClass = checked ? "fade" : "";
       } else {
         config[value] = checked;
       }

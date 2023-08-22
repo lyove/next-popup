@@ -42,10 +42,11 @@
 .popover-wrapper .popover-content {
   padding: 0.5rem;
   border-radius: 6px;
-  background: #fff;
+  background: #333;
+  color: #fff;
   box-shadow: 0 12px 20px 6px rgb(104 112 118 / 0.08);
 }
 
 .popover-wrapper .popover-arrow .arrow {
-  background: #fff;
+  background: #333;
 }

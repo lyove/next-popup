@@ -59,24 +59,24 @@ popover.destroy();
 
 ### CSS 动画
 
-通过 `cssName` 参数可以在弹出层显示和隐藏时，添加 CSS 动画。
+通过 `animationClass` 参数可以在弹出层显示和隐藏时，添加 CSS 动画。
 
 ```js
 const popover = new Popover({
-  cssName: 'fade'
+  animationClass: 'fade'
 });
 ```
 
-Popover 会通过 `cssName` 添加下面 6 个类。
+Popover 会通过 `animationClass` 添加下面 6 个类。
 
 ```js
-`${cssName}-enter-from` // 开始显示，下一帧被移除
-`${cssName}-enter-active` // 下一帧被添加，动画结束时移除
-`${cssName}-enter-to` // 下一帧被添加，动画结束时移除
-`${cssName}-exit-from` // 开始隐藏，下一帧被移除
-`${cssName}-exit-active` // 下一帧被添加，动画结束时移除
-`${cssName}-exit-to` // 下一帧被添加，动画结束时移除
-`${cssName}-${PLACEMENT}` // 当前弹窗位置
+`${animationClass}-enter-from` // 开始显示，下一帧被移除
+`${animationClass}-enter-active` // 下一帧被添加，动画结束时移除
+`${animationClass}-enter-to` // 下一帧被添加，动画结束时移除
+`${animationClass}-exit-from` // 开始隐藏，下一帧被移除
+`${animationClass}-exit-active` // 下一帧被添加，动画结束时移除
+`${animationClass}-exit-to` // 下一帧被添加，动画结束时移除
+`${animationClass}-${PLACEMENT}` // 当前弹窗位置
 ```
 
 你可以编写如下 css 样式。
@@ -157,14 +157,18 @@ new Popover({
   onExited() {
     // css 关闭动画完成后
   },
-  onBeforePosition(pos) {
+  onBeforePosition(positionXY) {
     // 设置弹出层位置前
-    // pos.position 最终的展示位置
-    // pos.xy 弹出层的位置，undefined 时表示不展示
-    // pos.arrowXY arrow 的位置，undefined 时表示不展示
+    // positionXY.position 最终的展示位置
+    // positionXY.xy 弹出层的位置，undefined 时表示不展示
+    // positionXY.arrowXY arrow 的位置，undefined 时表示不展示
     // 你可以直接修改 xy 和 arrowXY 来改变最终的位置
-    if (pos.xy) pos.xy[0] += 10
-    if (pos.arrowXY) pos.arrowXY[0] += 10
+    if (positionXY.xy) {
+      positionXY.xy[0] += 10;
+    }
+    if (positionXY.arrowXY) {
+      positionXY.arrowXY[0] += 10
+    }
   },
   onOpen() {
     // 弹出层展示时
@@ -212,7 +216,7 @@ canvas.on('scroll', () => popover.onScroll());
 | `autoPlacement` | `boolean` | `true` | 自动切换位置，当空间不足 |
 | `autoUpdate` | `boolean` | `true` | 容器，内容，触发元素大小变化自动更新位置 |
 | `autoScroll` | `boolean` | `true` | 自动跟随滚动 |
-| `cssName` | `string` | | css 动画类名 |
+| `animationClass` | `string` | | css 动画类名 |
 | `emit` | `EmitType` |  | 触发弹出类型 |
 | `clickOutsideClose` | `boolean` | `true` | 点击外部自动关闭弹出 |
 | `openDelay` | `number` | | 打开延迟 |
@@ -227,12 +231,12 @@ canvas.on('scroll', () => popover.onScroll());
 | `hideOnInvisible` | `boolean` | | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 |
 | `useTriggerPos` | `boolean` | | 使用 `trigger` 参数返回的 `left` 和 `top` 作为弹框坐标 |
 | `closeAnimation` | `boolean` | `true` | 是否需要关闭动画 |
-| `dragEl` | `HTMLElement` | | 用于拖拽弹窗的 DOM 元素 |
+| `dragElement` | `HTMLElement` | | 用于拖拽弹窗的 DOM 元素 |
 | `onBeforeEnter` | `() => void` | | css 进入动画开始之前 |
 | `onEntered` | `() => void` | | css 进入动画完成时 |
 | `onBeforeExit` | `() => void` | | css 关闭动画开始之前 |
 | `onExited` | `() => void` | | css 关闭动画完成 |
-| `onBeforePosition` | `(pos: Position) => void` | | 在设置弹出层位置之前，你可以修改 pos 对象，来设置最终弹出层位置 |
+| `onBeforePosition` | `(positonXY: PositionXY) => void` | | 在设置弹出层位置之前，你可以修改 pos 对象，来设置最终弹出层位置 |
 | `onOpen` | `() => void` | | 当弹出层展示 |
 | `onClose` | `() => void` | | 当弹出层关闭 |
 | `onClickOutside` | `() => void` | | 当弹出层关闭 |

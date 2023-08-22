@@ -364,7 +364,7 @@ export function getPopoverPositionXY({
     return { placement };
   }
 
-  let direction = getBoundaryPlacement(placement);
+  const direction = getBoundaryPlacement(placement);
   const newTranslate = [...translate];
 
   if (coverTrigger) {
@@ -404,13 +404,38 @@ export function getPopoverPositionXY({
     newPopoverPosition = placementAndPosition.position;
   }
 
+  const newDirection = getBoundaryPlacement(newPlacement);
+
+  // arrow offset
+  if (arrowRect) {
+    const arrH =
+      (Math.sqrt(arrowRect.width * arrowRect.width + arrowRect.height * arrowRect.height) || 0) / 2;
+    switch (newDirection) {
+      case PLACEMENT.T:
+        newPopoverPosition[1] -= arrH;
+        break;
+      case PLACEMENT.B:
+        newPopoverPosition[1] += arrH;
+        break;
+
+      case PLACEMENT.L:
+        newPopoverPosition[0] -= arrH;
+        break;
+
+      case PLACEMENT.R:
+        newPopoverPosition[0] += arrH;
+        break;
+
+      default:
+    }
+  }
+
   let arrowXY: undefined | number[];
   if (!triggerIsOutOfRange && arrowRect) {
-    direction = getBoundaryPlacement(newPlacement);
     arrowXY = [];
     const half = [arrowRect.width / 2, arrowRect.height / 2];
-    const isL = direction === PLACEMENT.L;
-    const isR = direction === PLACEMENT.R;
+    const isL = newDirection === PLACEMENT.L;
+    const isR = newDirection === PLACEMENT.R;
     if (isL || isR) {
       arrowXY[1] = triggerRect.top + triggerRect.height / 2 - newPopoverPosition[1] - half[1];
       if (arrowXY[1] < half[1] || arrowXY[1] > popoverRect.height - arrowRect.height - half[1]) {
@@ -423,7 +448,7 @@ export function getPopoverPositionXY({
       if (arrowXY[0] < half[0] || arrowXY[0] > popoverRect.width - arrowRect.width - half[0]) {
         arrowXY = undefined;
       } else {
-        arrowXY[1] = (direction === PLACEMENT.T ? popoverRect.height : 0) - half[1];
+        arrowXY[1] = (newDirection === PLACEMENT.T ? popoverRect.height : 0) - half[1];
       }
     }
   }

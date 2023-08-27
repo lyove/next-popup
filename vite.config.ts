@@ -1,4 +1,4 @@
-import path from "path";
+import * as path from "path";
 import { defineConfig } from "vite";
 import banner from "vite-plugin-banner";
 import packageJson from "./package.json";
@@ -45,6 +45,9 @@ export default defineConfig(({ command, mode }) => {
       port: 8080,
       https: false,
       open: true,
+      hmr: {
+        overlay: false,
+      },
     },
     build: {
       lib: {

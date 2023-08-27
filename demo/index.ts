@@ -38,7 +38,7 @@ window.onload = function () {
     openDelay: 0,
     closeDelay: 50,
     emit: EmitType.CLICK,
-    open: true,
+    open: false,
   };
 
   const popover = new Popover(config as any);
@@ -111,4 +111,31 @@ window.onload = function () {
       update();
     }
   };
+
+  // =====================================================================
+  const placementsItems = document.querySelectorAll(".popover_trigger");
+  const config_2 = {
+    mountContainer: document.body,
+    content: "Next-Popover",
+    wrapperClass: "test-popover",
+    showArrow: true,
+    autoPlacement: true,
+    autoUpdate: true,
+    autoScroll: true,
+    translate: [0, 0],
+    animationClass: "fade",
+    placement: PLACEMENT.T,
+    openDelay: 0,
+    closeDelay: 50,
+    emit: EmitType.HOVER,
+    open: false,
+  };
+
+  placementsItems.forEach((item) => {
+    new Popover({
+      ...config_2,
+      trigger: item,
+      placement: item.dataset.placement,
+    });
+  });
 };

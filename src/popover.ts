@@ -1,5 +1,5 @@
 import type { Rect, PopoverConfig, AnimationClass, TransitionInfo } from "./type";
-import { $, destroy, throttle, getChangedAttrs, Drag, clamp } from "./utils";
+import { $, destroy, throttle, getChangedAttrs, Drag, clamp, guid } from "./utils";
 import {
   getPopoverPositionXY,
   getTransitionInfo,
@@ -137,7 +137,7 @@ export default class Popover {
     this.#triggerIsElement = trigger instanceof Element;
 
     // Positioning Element
-    this.originalElement = $("div", { id: NextPopoverId });
+    this.originalElement = $("div", { id: `${NextPopoverId}_${guid()}` });
     const { style } = this.originalElement;
     style.position = "absolute";
     style.left = style.top = "0";
@@ -154,8 +154,16 @@ export default class Popover {
     }
 
     // Popover content
-    (content as HTMLElement).classList.add(PopoverContentClass);
-    this.popoverWrapper.appendChild(content);
+    if (content instanceof HTMLElement) {
+      content.classList.add(PopoverContentClass);
+      this.popoverWrapper.appendChild(content);
+    } else {
+      const newContent = $("div", {
+        class: PopoverContentClass,
+      });
+      newContent.innerHTML = content.toString();
+      this.popoverWrapper.appendChild(newContent);
+    }
 
     if (this.config.showArrow) {
       this.arrowElement = this.#createArrow();

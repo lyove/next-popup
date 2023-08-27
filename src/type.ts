@@ -2,7 +2,7 @@ import type { EmitType, PLACEMENT } from "./constant";
 
 export interface PopoverConfig {
   trigger: Element | { getBoundingClientRect: () => Rect };
-  content: Node;
+  content: Node | string;
   mountContainer?: HTMLElement;
   triggerOpenClass?: string;
   wrapperClass?: string;

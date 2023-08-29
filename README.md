@@ -230,7 +230,6 @@ canvas.on('scroll', () => popover.onScroll());
 | `hideOnInvisible` | `boolean` | | Whether to automatically hide the popover when the trigger element is invisible on the screen. |
 | `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popover coordinates | 
 | `closeAnimation` | `boolean` | `true` | Whether to animate when closing |
-| `dragElement` | `HTMLElement` | | The DOM element used to drag the popover position |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
 | `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |

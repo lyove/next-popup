@@ -1,5 +1,5 @@
 import type { Rect, PopoverConfig, AnimationClass, TransitionInfo } from "./type";
-import { $, destroy, throttle, getChangedAttrs, Drag, clamp, guid } from "./utils";
+import { $, destroy, throttle, getChangedAttrs, guid } from "./utils";
 import {
   getPopoverPositionXY,
   getTransitionInfo,
@@ -103,8 +103,6 @@ export default class Popover {
   #closeTimer?: any;
 
   #prevPlacement?: PLACEMENT;
-
-  #drag?: Drag;
 
   /**
    * Constructor
@@ -272,28 +270,6 @@ export default class Popover {
         this.#popHide = false;
         showDomElement(this.originalElement);
       }
-      if (fromHide && config.dragElement) {
-        const diffXY: number[] = [];
-        const curXY: number[] = [];
-        const maxX = mountContainerRect.width - popWrapRect.width;
-        const maxY = mountContainerRect.height - popWrapRect.height;
-        this.#drag = new Drag(
-          config.dragElement,
-          (ev: PointerEvent) => {
-            diffXY[0] = xy[0] - ev.clientX;
-            diffXY[1] = xy[1] - ev.clientY;
-          },
-          (ev: PointerEvent) => {
-            curXY[0] = clamp(diffXY[0] + ev.clientX, 0, maxX);
-            curXY[1] = clamp(diffXY[1] + ev.clientY, 0, maxY);
-            this.originalElement.style.transform = `translate3d(${curXY[0]}px,${curXY[1]}px,0)`;
-          },
-          () => {
-            xy[0] = curXY[0];
-            xy[1] = curXY[1];
-          },
-        );
-      }
     } else if (!this.#popHide) {
       hideDomElement(this.originalElement);
       this.#popHide = true;
@@ -386,10 +362,6 @@ export default class Popover {
 
     this.#removeScrollEvent();
     this.#removeDocClick();
-    if (this.#drag) {
-      this.#drag.destroy();
-      this.#drag = undefined;
-    }
     if (config.onClose) {
       config.onClose();
     }
@@ -634,10 +606,6 @@ export default class Popover {
     this.#removeDocClick();
     this.#removeEmitEvent();
     this.#removeEnterEvent();
-    if (this.#drag) {
-      this.#drag.destroy();
-      this.#drag = undefined;
-    }
     destroy(this);
   }
 
@@ -656,7 +624,6 @@ export default class Popover {
    * Create popover dom element
    */
   #createPopover() {
-    // ========================================================================
     const { content, mountContainer, wrapperClass } = this.config;
 
     // Positioning Element

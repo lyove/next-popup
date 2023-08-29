@@ -655,6 +655,7 @@ export default class Popover {
     if (this.opened) {
       try {
         mountContainer!.removeChild(this.originalElement);
+        this.originalElement.style.transform = "";
       } catch (e) {
         //
       }
@@ -695,6 +696,7 @@ export default class Popover {
   #hide() {
     const { mountContainer } = this.config;
     mountContainer!.removeChild(this.originalElement);
+    this.originalElement.style.transform = "";
   }
 
   #setAnimationClass() {

@@ -15,7 +15,6 @@ export interface PopoverConfig {
   closeDelay?: number;
   open?: boolean;
   disabled?: boolean;
-  dragElement?: HTMLElement;
   enterable?: boolean;
   translate?: number[];
   autoPlacement?: boolean;

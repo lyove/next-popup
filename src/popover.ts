@@ -74,8 +74,6 @@ export default class Popover {
     closeDelay: 50,
   };
 
-  #triggerIsElement!: boolean;
-
   #animationClass?: AnimationClass;
 
   #popHide = false;
@@ -128,48 +126,13 @@ export default class Popover {
       ...config,
     };
 
-    const { trigger, content, mountContainer, wrapperClass, overflowHidden } = this.config;
+    const { trigger, content, mountContainer, overflowHidden } = this.config;
 
     if (!trigger || !content) {
       throw new Error("Invalid argument");
     }
 
-    this.#triggerIsElement = trigger instanceof Element;
-
-    // Positioning Element
-    this.originalElement = $("div", { id: `${NextPopoverId}_${guid()}` });
-    const { style } = this.originalElement;
-    style.position = "absolute";
-    style.left = style.top = "0";
-
-    // Popover wrapper
-    this.popoverWrapper = $("div", {
-      class: `${PopoverWrapperClass}${wrapperClass ? ` ${wrapperClass}` : ""}`,
-    });
-    this.originalElement.appendChild(this.popoverWrapper);
-
-    // Popover mounted elements
-    if (mountContainer && mountContainer !== document.body) {
-      mountContainer.style.position = "relative";
-    }
-
-    // Popover content
-    if (content instanceof HTMLElement) {
-      content.classList.add(PopoverContentClass);
-      this.popoverWrapper.appendChild(content);
-    } else {
-      const newContent = $("div", {
-        class: PopoverContentClass,
-      });
-      newContent.innerHTML = content.toString();
-      this.popoverWrapper.appendChild(newContent);
-    }
-
-    if (this.config.showArrow) {
-      this.arrowElement = this.#createArrow();
-      this.arrowElement.appendChild(this.config.arrow || this.#builtinArrow());
-      this.popoverWrapper.appendChild(this.arrowElement);
-    }
+    this.#createPopover();
 
     if (this.config.autoUpdate) {
       this.#observe();
@@ -231,7 +194,7 @@ export default class Popover {
     const mountContainerRect = (config.mountContainer || document.body).getBoundingClientRect();
     const arrowRect = this.arrowElement?.getBoundingClientRect();
 
-    if (this.#triggerIsElement) {
+    if (config.trigger instanceof Element) {
       triggerRect = {
         left:
           config.mountContainer !== document.body
@@ -417,7 +380,7 @@ export default class Popover {
       this.#hide();
     }
 
-    if (this.#triggerIsElement && config.triggerOpenClass) {
+    if (config.trigger instanceof Element && config.triggerOpenClass) {
       (config.trigger as Element).classList.remove(config.triggerOpenClass);
     }
 
@@ -453,6 +416,7 @@ export default class Popover {
     }
 
     const { trigger, triggerOpenClass, mountContainer, showArrow } = this.config;
+    const triggerIsElement = trigger instanceof Element;
 
     changed.forEach(([k, n, o]) => {
       switch (k) {
@@ -464,7 +428,7 @@ export default class Popover {
           break;
 
         case "emit":
-          if (this.#triggerIsElement) {
+          if (triggerIsElement) {
             this.#removeEmitEvent();
             if (n) {
               this.#addTriggerEvent();
@@ -485,7 +449,7 @@ export default class Popover {
           break;
 
         case "triggerOpenClass":
-          if (this.opened && this.#triggerIsElement) {
+          if (this.opened && triggerIsElement) {
             if (o) {
               (trigger as Element).classList.remove(o as string);
             }
@@ -504,23 +468,23 @@ export default class Popover {
 
         case "trigger":
           {
-            const oldIsTriggerEl = this.#triggerIsElement;
+            const oldIsTriggerEl = triggerIsElement;
             if (oldIsTriggerEl) {
               this.#removeEmitEvent(o as HTMLElement);
               if (triggerOpenClass) {
                 (o as Element).classList.remove(triggerOpenClass);
               }
             }
-            this.#triggerIsElement = n instanceof Element;
+            const newTriggerIsElement = n instanceof Element;
             if (this.#resizeObserver) {
               if (oldIsTriggerEl) {
                 this.#resizeObserver.unobserve(o as HTMLElement);
               }
-              if (this.#triggerIsElement) {
+              if (newTriggerIsElement) {
                 this.#resizeObserver.observe(n as HTMLElement);
               }
             }
-            if (this.#triggerIsElement) {
+            if (newTriggerIsElement) {
               this.#addTriggerEvent();
               if (this.opened && triggerOpenClass) {
                 (o as Element).classList.add(triggerOpenClass);
@@ -688,6 +652,59 @@ export default class Popover {
     }
   });
 
+  /**
+   * Create popover dom element
+   */
+  #createPopover() {
+    // ========================================================================
+    const { content, mountContainer, wrapperClass } = this.config;
+
+    // Positioning Element
+    this.originalElement = $("div", { id: `${NextPopoverId}_${guid()}` });
+    const { style } = this.originalElement;
+    style.position = "absolute";
+    style.left = style.top = "0";
+
+    // Popover wrapper
+    this.popoverWrapper = $("div", {
+      class: `${PopoverWrapperClass}${wrapperClass ? ` ${wrapperClass}` : ""}`,
+    });
+    this.originalElement.appendChild(this.popoverWrapper);
+
+    // Popover mounted elements
+    if (mountContainer && mountContainer !== document.body) {
+      mountContainer.style.position = "relative";
+    }
+
+    // Popover content
+    if (content instanceof HTMLElement) {
+      content.classList.add(PopoverContentClass);
+      this.popoverWrapper.appendChild(content);
+    } else {
+      const newContent = $("div", {
+        class: PopoverContentClass,
+      });
+      newContent.innerHTML = content.toString();
+      this.popoverWrapper.appendChild(newContent);
+    }
+
+    if (this.config.showArrow) {
+      this.arrowElement = this.#createArrow();
+      this.arrowElement.appendChild(this.config.arrow || this.#builtinArrow());
+      this.popoverWrapper.appendChild(this.arrowElement);
+    }
+    // ========================================================================
+  }
+
+  #createArrow() {
+    const arrowEl = $("div", { class: PopoverArrowClass });
+    const style = arrowEl.style;
+    style.position = "absolute";
+    style.left = style.top = "0";
+    // style.zIndex = "-1";
+    return arrowEl;
+  }
+
   #show() {
     const { mountContainer } = this.config;
     mountContainer!.appendChild(this.originalElement);
@@ -711,15 +728,6 @@ export default class Popover {
           exitTo: `${animationClass}-exit-to`,
         }
       : undefined;
-  }
-
-  #createArrow() {
-    const arrowEl = $("div", { class: PopoverArrowClass });
-    const style = arrowEl.style;
-    style.position = "absolute";
-    style.left = style.top = "0";
-    // style.zIndex = "-1";
-    return arrowEl;
   }
 
   #builtinArrow() {
@@ -759,13 +767,12 @@ export default class Popover {
   };
 
   #onDocClick = ({ target }: MouseEvent) => {
-    const { onClickOutside, clickOutsideClose } = this.config;
+    const { trigger, onClickOutside, clickOutsideClose } = this.config;
 
     if (onClickOutside || clickOutsideClose) {
       if (
         this.popoverWrapper?.contains(target as HTMLElement) ||
-        (this.#triggerIsElement &&
-          (this.config.trigger as HTMLElement)?.contains(target as HTMLElement))
+        (trigger instanceof Element && (trigger as HTMLElement)?.contains(target as HTMLElement))
       ) {
         return;
       }
@@ -790,14 +797,14 @@ export default class Popover {
     const robs = (this.#resizeObserver = new ResizeObserver(() => this.update()));
     robs.observe(this.popoverWrapper);
     robs.observe(mountContainer!);
-    if (this.#triggerIsElement) {
+    if (trigger instanceof Element) {
       robs.observe(trigger as HTMLElement);
     }
   }
 
   #addTriggerEvent() {
     const { config } = this;
-    if (this.#triggerIsElement && config.emit) {
+    if (config.trigger instanceof Element && config.emit) {
       const { trigger } = config;
       if (config.emit === EmitType.CLICK) {
         (trigger as HTMLElement).addEventListener("click", this.#onTriggerClick);
@@ -897,7 +904,7 @@ export default class Popover {
   };
 
   #needListenScroll() {
-    const { mountContainer, autoScroll, closeOnScroll } = this.config;
-    return this.#triggerIsElement && mountContainer && (autoScroll || closeOnScroll);
+    const { trigger, mountContainer, autoScroll, closeOnScroll } = this.config;
+    return trigger instanceof Element && mountContainer && (autoScroll || closeOnScroll);
   }
 }

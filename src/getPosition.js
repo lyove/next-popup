@@ -1,7 +1,7 @@
 import { $setData, $setStyle } from "./utils";
 
 // getm more visible sides
-function getMoreVisibleSides($element) {
+const getMoreVisibleSides = ($element) => {
   if (!$element) {
     return {};
   }
@@ -22,10 +22,10 @@ function getMoreVisibleSides($element) {
     horizontal,
     vertical,
   };
-}
+};
 
 // get absolute coords of the element
-function getAbsoluteCoords($element) {
+const getAbsoluteCoords = ($element) => {
   if (!$element) {
     return;
   }
@@ -50,7 +50,7 @@ function getAbsoluteCoords($element) {
     bottom: boxRect.bottom + pageY,
     left: boxRect.left + pageX,
   };
-}
+};
 
 /**
  * compute popover position
@@ -291,6 +291,12 @@ export default function getPosition({
 
     if (mainPlacement === "top" || mainPlacement === "bottom") {
       arrowLeft = triggerElementWidthCenter - fullLeft;
+      if (inversePlacement) {
+        arrowTop = mainPlacement === "top" ? 0 : popoverElementHeight;
+      } else {
+        arrowTop = mainPlacement === "top" ? popoverElementHeight : 0;
+      }
+
       /** if arrow crossed left edge of popover element */
       if (arrowLeft < arrowWidthHalf) {
         arrowLeft = arrowWidthHalf;
@@ -300,6 +306,12 @@ export default function getPosition({
       }
     } else if (mainPlacement === "left" || mainPlacement === "right") {
       arrowTop = triggerElementHeightCenter - fullTop;
+      if (inversePlacement) {
+        arrowLeft = mainPlacement === "left" ? 0 : popoverElementWidth;
+      } else {
+        arrowLeft = mainPlacement === "left" ? popoverElementWidth : 0;
+      }
+
       /** if arrow crossed top edge of popover element */
       if (arrowTop < arrowWidthHalf) {
         arrowTop = arrowWidthHalf;

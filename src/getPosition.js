@@ -1,3 +1,5 @@
+import { $setData, $setStyle } from "./utils";
+
 // getm more visible sides
 function getMoreVisibleSides($element) {
   if (!$element) {
@@ -51,7 +53,7 @@ function getAbsoluteCoords($element) {
 }
 
 /**
- * compute position
+ * compute popover position
  * @param {*} params
  * @returns {}
  */
@@ -75,6 +77,14 @@ export default function getPosition({
   if (!triggerElement || !popoverElement) {
     throw new Error("Couldn't initiate");
   }
+
+  // reset popover style
+  $setStyle(popoverElement, {
+    position: "absolute",
+    left: "0",
+    top: "0",
+    transform: "",
+  });
 
   // popover Rect
   const popoverElementCoords = getAbsoluteCoords(popoverElement);
@@ -303,10 +313,10 @@ export default function getPosition({
   return {
     left,
     top,
-    fromLeft,
-    fromTop,
     arrowLeft,
     arrowTop,
+    fromLeft,
+    fromTop,
     placement,
   };
 }

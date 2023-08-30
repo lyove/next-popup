@@ -39,8 +39,8 @@ const popover = new Popover({
   mountContainer,
   trigger, // 必填
   content, // 必填
-  placement: PLACEMENT.T, // 设置弹框位置
-  emit: EmitType.HOVER // 设置鼠标 hover 在 trigger 上时打开弹框
+  placement: PLACEMENT.Top, // 设置弹框位置
+  emit: EmitType.Hover // 设置鼠标 hover 在 trigger 上时打开弹框
 });
 
 trigger.onclick = () => {
@@ -127,17 +127,13 @@ const popover = new Popover({
 
 ### 滚动
 
-通过 `autoScroll` 参数可以控制 `trigger` 元素滚动时，弹出层自动跟随滚动。
-
 `closeOnScroll` 参数控制 `trigger` 元素滚动时，弹出层自动关闭。
 
-`hideOnInvisible` 参数控制 `trigger` 元素在屏幕上看不见时，弹出层自动隐藏。
+<!-- `hideOnInvisible` 参数控制 `trigger` 元素在屏幕上看不见时，弹出层自动隐藏。 -->
 
 ### 自动更新
 
 `autoUpdate` 参数控制当容器，内容，trigger 大小发生改变时，自动更新弹出层位置。依赖 [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) 。
-
-`autoPlacement` 参数控制当空间的不足时是否自动调整位置，让弹出层完全展出出来。
 
 ### 钩子
 
@@ -156,19 +152,6 @@ new Popover({
   },
   onExited() {
     // css 关闭动画完成后
-  },
-  onBeforePosition(positionXY) {
-    // 设置弹出层位置前
-    // positionXY.position 最终的展示位置
-    // positionXY.xy 弹出层的位置，undefined 时表示不展示
-    // positionXY.arrowXY arrow 的位置，undefined 时表示不展示
-    // 你可以直接修改 xy 和 arrowXY 来改变最终的位置
-    if (positionXY.xy) {
-      positionXY.xy[0] += 10;
-    }
-    if (positionXY.arrowXY) {
-      positionXY.arrowXY[0] += 10
-    }
   },
   onOpen() {
     // 弹出层展示时
@@ -211,11 +194,8 @@ canvas.on('scroll', () => popover.onScroll());
 | `mountContainer` | `HTMLElement` | `document.body` | 弹出层的挂载容器 |
 | `showArrow` | `Boolean` | `true` | 是否显示箭头元素 |
 | `arrow` | `Element` | | 箭头元素 |
-| `placement` | `PLACEMENT` | `PLACEMENT.T` | 弹出层的位置 |
-| `translate` | `[number, number]` | `[0, 0]` | 自定义 xy 偏移量 |
-| `autoPlacement` | `boolean` | `true` | 自动切换位置，当空间不足 |
+| `placement` | `PLACEMENT` | `PLACEMENT.Top` | 弹出层的位置 |
 | `autoUpdate` | `boolean` | `true` | 容器，内容，触发元素大小变化自动更新位置 |
-| `autoScroll` | `boolean` | `true` | 自动跟随滚动 |
 | `animationClass` | `string` | | css 动画类名 |
 | `emit` | `EmitType` |  | 触发弹出类型 |
 | `clickOutsideClose` | `boolean` | `true` | 点击外部自动关闭弹出 |
@@ -225,17 +205,14 @@ canvas.on('scroll', () => popover.onScroll());
 | `disabled` | `boolean` | | 是否禁用 |
 | `triggerOpenClass` | `string` | | 弹窗开启时给 `trigger` 添加的 `class` |
 | `enterable` | `boolean` | `true` | 当 `emit` 等于 `hover` 时，鼠标是否可进入弹出层 |
-| `overflowHidden` | `boolean` | 自动检测 | 容器是否 overflow hidden |
-| `coverTrigger` | `boolean` | | 弹出层是否覆盖 trigger 元素 |
 | `closeOnScroll` | `boolean` | | 是否在滚动时自动关闭 |
-| `hideOnInvisible` | `boolean` | | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 |
+<!-- | `hideOnInvisible` | `boolean` | | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 | -->
 | `useTriggerPos` | `boolean` | | 使用 `trigger` 参数返回的 `left` 和 `top` 作为弹框坐标 |
 | `closeAnimation` | `boolean` | `true` | 是否需要关闭动画 |
 | `onBeforeEnter` | `() => void` | | css 进入动画开始之前 |
 | `onEntered` | `() => void` | | css 进入动画完成时 |
 | `onBeforeExit` | `() => void` | | css 关闭动画开始之前 |
 | `onExited` | `() => void` | | css 关闭动画完成 |
-| `onBeforePosition` | `(positonXY: PositionXY) => void` | | 在设置弹出层位置之前，你可以修改 pos 对象，来设置最终弹出层位置 |
 | `onOpen` | `() => void` | | 当弹出层展示 |
 | `onClose` | `() => void` | | 当弹出层关闭 |
 | `onClickOutside` | `() => void` | | 当弹出层关闭 |

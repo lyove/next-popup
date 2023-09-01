@@ -2,6 +2,12 @@
  * Basic
  */
 
+.next-popover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* z-index: -1; */
+}
 .popover-wrapper {
   position: relative;
   box-sizing: content-box;
@@ -13,10 +19,18 @@
 
 .popover-wrapper .popover-arrow {
   box-sizing: content-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* z-index: -1; */
 }
 
-.popover-wrapper .popover-arrow .arrow.inherent {
-  display: block;
+.popover-wrapper .popover-arrow .arrow.builtin {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  transform-origin: center;
 }
 
 .popover-wrapper .popover-arrow svg.arrow {
@@ -36,7 +50,7 @@
 }
 
 /**
- * Default: light mode
+ * Default: dark mode
  * ================================ */
 
 .popover-wrapper .popover-content {

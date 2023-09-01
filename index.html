@@ -7,64 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Next-Popover</title>
   <link rel="stylesheet" href="./demo/style.css" />
-  <style>
-    /* popover-base-box */
-    .popover-base-box {
-      width: 600px;
-      margin: 10rem auto;
-    }
-
-    .popover-base-box .row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .popover-base-box .center {
-      justify-content: center;
-    }
-
-    .popover-base-box .box-item {
-      width: 110px;
-      margin-top: 10px;
-    }
-
-    .trigger-btn {
-      display: inline-flex;
-      justify-content: center;
-      align-items: center;
-      line-height: 1;
-      height: 32px;
-      white-space: nowrap;
-      cursor: pointer;
-      text-align: center;
-      box-sizing: border-box;
-      outline: none;
-      transition: 0.1s;
-      user-select: none;
-      vertical-align: middle;
-      -webkit-appearance: none;
-      border: 1px solid rgb(220, 223, 230);
-      padding: 8px 15px;
-      border-radius: 4px;
-    }
-
-    .ml-3 {
-      margin-left: 0.75rem;
-    }
-
-    .mr-3 {
-      margin-right: 0.75rem;
-    }
-
-    .mt-3 {
-      margin-top: 0.75rem;
-    }
-
-    .mb-3 {
-      margin-bottom: 0.75rem;
-    }
-  </style>
 </head>
 
 <body>
@@ -72,8 +14,35 @@
     <header>
       <span>Next-Popover</span>
     </header>
-    <div class="sidebar configure">
-      <div class="nav-vertical">
+    <div class="feature">
+      <div class="description">
+        <div class="btn-row">
+          <a class="btn pri" href="https://github.com/lyove/next-popover" target="_blank">
+            Get Started
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <a class="btn" href="https://github.com/lyove/next-popover" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+              </path>
+            </svg>
+            Github
+          </a>
+        </div>
+        <p class="tagline">
+          Next-Popover is a smart popover library that can automatically pop up at a suitable
+          position adjacent to the trigger.
+        </p>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="configure">
         <div class="placement">
           <fieldset>
             <legend>Placement</legend>
@@ -94,8 +63,8 @@
         <div class="emit">
           <fieldset>
             <legend>Emit</legend>
-            <label><input type="radio" name="emit" value="hover" />hover</label>
             <label><input type="radio" name="emit" value="click" checked />click</label>
+            <label><input type="radio" name="emit" value="hover" />hover</label>
           </fieldset>
         </div>
         <div class="extra">
@@ -126,33 +95,6 @@
           </fieldset>
         </div>
       </div>
-    </div>
-    <div class="main-content">
-      <div class="description">
-        <p class="tagline">
-          Next-Popover is a smart popover library that can automatically pop up at a suitable
-          position adjacent to the trigger.
-        </p>
-        <div class="btn-row">
-          <a class="btn pri" href="https://github.com/lyove/next-popover" target="_blank">
-            Get Started
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </a>
-          <a class="btn" href="https://github.com/lyove/next-popover" target="_blank">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path
-                d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
-              </path>
-            </svg>
-            Github
-          </a>
-        </div>
-      </div>
       <div class="mount-container">
         <div class="scroll-box">
           <div class="trigger-outer">
@@ -160,53 +102,54 @@
           </div>
         </div>
       </div>
-
       <div class="popover-base-box">
-        <div class="row center">
-          <button type="button" data-placement="top-start" class="popover_trigger trigger-btn">
-            top-start
-          </button>
-          <button type="button" data-placement="top" class="popover_trigger trigger-btn ml-3 mr-3">
-            top
-          </button>
-          <button type="button" data-placement="top-end" class="popover_trigger trigger-btn">
-            top-end
-          </button>
-        </div>
-        <div class="row">
-          <button type="button" data-placement="left-start" class="popover_trigger trigger-btn">
-            left-start
-          </button>
-          <button type="button" data-placement="right-start" class="popover_trigger trigger-btn">
-            right-start
-          </button>
-        </div>
-        <div class="row">
-          <button type="button" data-placement="left" class="popover_trigger trigger-btn mt-3 mb-3">
-            left
-          </button>
-          <button type="button" data-placement="right" class="popover_trigger trigger-btn mt-3 mb-3">
-            right
-          </button>
-        </div>
-        <div class="row">
-          <button type="button" data-placement="left-end" class="popover_trigger trigger-btn">
-            left-end
-          </button>
-          <button type="button" data-placement="right-end" class="popover_trigger trigger-btn">
-            right-end
-          </button>
-        </div>
-        <div class="row center">
-          <button type="button" data-placement="bottom-start" class="popover_trigger trigger-btn">
-            bottom-start
-          </button>
-          <button type="button" data-placement="bottom" class="popover_trigger trigger-btn ml-3 mr-3">
-            bottom
-          </button>
-          <button type="button" data-placement="bottom-end" class="popover_trigger trigger-btn">
-            bottom-end
-          </button>
+        <div class="inbox">
+          <div class="row center">
+            <button type="button" data-placement="top-start" class="popover_trigger trigger-btn">
+              top-start
+            </button>
+            <button type="button" data-placement="top" class="popover_trigger trigger-btn ml-3 mr-3">
+              top
+            </button>
+            <button type="button" data-placement="top-end" class="popover_trigger trigger-btn">
+              top-end
+            </button>
+          </div>
+          <div class="row">
+            <button type="button" data-placement="left-start" class="popover_trigger trigger-btn">
+              left-start
+            </button>
+            <button type="button" data-placement="right-start" class="popover_trigger trigger-btn">
+              right-start
+            </button>
+          </div>
+          <div class="row">
+            <button type="button" data-placement="left" class="popover_trigger trigger-btn mt-3 mb-3">
+              left
+            </button>
+            <button type="button" data-placement="right" class="popover_trigger trigger-btn mt-3 mb-3">
+              right
+            </button>
+          </div>
+          <div class="row">
+            <button type="button" data-placement="left-end" class="popover_trigger trigger-btn">
+              left-end
+            </button>
+            <button type="button" data-placement="right-end" class="popover_trigger trigger-btn">
+              right-end
+            </button>
+          </div>
+          <div class="row center">
+            <button type="button" data-placement="bottom-start" class="popover_trigger trigger-btn">
+              bottom-start
+            </button>
+            <button type="button" data-placement="bottom" class="popover_trigger trigger-btn ml-3 mr-3">
+              bottom
+            </button>
+            <button type="button" data-placement="bottom-end" class="popover_trigger trigger-btn">
+              bottom-end
+            </button>
+          </div>
         </div>
       </div>
     </div>

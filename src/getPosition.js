@@ -80,9 +80,6 @@ export default function getPosition({
 
   // reset popover style
   $setStyle(popoverElement, {
-    position: "absolute",
-    left: "0",
-    top: "0",
     transform: "",
   });
 

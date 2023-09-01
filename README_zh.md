@@ -26,7 +26,7 @@ npm i next-popover
 ## 快速开始
 
 ```js
-import Popover, { PLACEMENT, EmitType } from 'next-popover'
+import Popover, { Placement, EmitType } from 'next-popover'
 
 const mountContainer = document.querySelector('.mount-container'); // 默认: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -39,7 +39,7 @@ const popover = new Popover({
   mountContainer,
   trigger, // 必填
   content, // 必填
-  placement: PLACEMENT.Top, // 设置弹框位置
+  placement: Placement.Top, // 设置弹框位置
   emit: EmitType.Hover // 设置鼠标 hover 在 trigger 上时打开弹框
 });
 
@@ -76,7 +76,7 @@ Popover 会通过 `animationClass` 添加下面 6 个类。
 `${animationClass}-exit-from` // 开始隐藏，下一帧被移除
 `${animationClass}-exit-active` // 下一帧被添加，动画结束时移除
 `${animationClass}-exit-to` // 下一帧被添加，动画结束时移除
-`${animationClass}-${PLACEMENT}` // 当前弹窗位置
+`${animationClass}-${Placement}` // 当前弹窗位置
 ```
 
 你可以编写如下 css 样式。
@@ -194,7 +194,7 @@ canvas.on('scroll', () => popover.onScroll());
 | `mountContainer` | `HTMLElement` | `document.body` | 弹出层的挂载容器 |
 | `showArrow` | `Boolean` | `true` | 是否显示箭头元素 |
 | `arrow` | `Element` | | 箭头元素 |
-| `placement` | `PLACEMENT` | `PLACEMENT.Top` | 弹出层的位置 |
+| `placement` | `Placement` | `Placement.Top` | 弹出层的位置 |
 | `autoUpdate` | `boolean` | `true` | 容器，内容，触发元素大小变化自动更新位置 |
 | `animationClass` | `string` | | css 动画类名 |
 | `emit` | `EmitType` |  | 触发弹出类型 |

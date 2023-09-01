@@ -44,8 +44,3 @@ export interface AnimationClass {
   exitActive: string;
   exitTo: string;
 }
-
-export interface TransitionInfo {
-  event?: "transitionend" | "animationend";
-  timeout: number;
-}

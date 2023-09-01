@@ -1,108 +1,64 @@
-import type { Rect, PopoverConfig, AnimationClass, TransitionInfo } from "./type";
-import { $, destroy, throttle, getChangedAttrs, guid } from "./utils";
+import type { PopoverConfig, AnimationClass, RectInfo } from "./type";
+import getPosition from "./getPosition";
 import {
-  getPopoverPositionXY,
-  getTransitionInfo,
-  getScrollElements,
-  showDomElement,
-  hideDomElement,
-} from "./helpers";
+  $,
+  $showDomElement,
+  $removeElements,
+  $setStyle,
+  $getStyleProperties,
+  destroy,
+  throttle,
+  getChangedAttrs,
+  guid,
+} from "./utils";
 import {
   NextPopoverId,
   PopoverWrapperClass,
   PopoverContentClass,
   PopoverArrowClass,
-  PopoverArrowInnerClass,
   EmitType,
-  PLACEMENT,
+  Placement,
 } from "./constant";
-import "./style.css";
+import "./style/index.scss";
 
-export function createArrow({
-  tag,
-  style,
-  class: cls,
-}: {
-  tag?: string;
-  style?: Partial<CSSStyleDeclaration>;
-  class?: string;
-}) {
-  const el = $(tag);
-  el.classList.add(PopoverArrowInnerClass);
-  if (cls) {
-    el.classList.add(cls);
-  }
-  Object.assign(el.style, {
-    width: "10px",
-    height: "10px",
-    transform: "rotate(45deg)",
-    transformOrigin: "center",
-    ...style,
-  });
-  return el as HTMLElement;
-}
+export { $, EmitType, Placement };
 
 /**
  * Popover
  * A lightweight smart javascript popover library
  */
 export default class Popover {
+  /* public property */
   config!: PopoverConfig;
-
   originalElement!: HTMLElement;
-
   popoverWrapper!: HTMLElement;
-
   arrowElement?: HTMLElement;
-
   opened = false;
-
   closed = true;
 
+  /* private property */
   #defaultConfig: Partial<PopoverConfig> = {
-    placement: PLACEMENT.T,
-    showArrow: false,
+    placement: Placement.Top,
+    showArrow: true,
     mountContainer: document.body,
-    autoPlacement: true,
     autoUpdate: true,
-    autoScroll: true,
     animationClass: "fade",
-    translate: [0, 0],
     clickOutsideClose: true,
     closeAnimation: true,
     enterable: true,
-    closeDelay: 50,
+    closeDelay: 0,
   };
-
   #animationClass?: AnimationClass;
-
-  #popHide = false;
-
-  #arrowHide = false;
-
   #isAnimating = false;
-
-  #showRaf?: any;
-
-  #hideRaf?: any;
-
-  #showTransInfo?: ReturnType<typeof getTransitionInfo>;
-
-  #hideTransInfo?: ReturnType<typeof getTransitionInfo>;
-
+  #showRaf?: number;
+  #hideRaf?: number;
   #clearShow?: () => void;
-
   #clearHide?: () => void;
-
   #scrollElements?: HTMLElement[];
-
   #resizeObserver?: ResizeObserver;
-
-  #openTimer?: any;
-
-  #closeTimer?: any;
-
-  #prevPlacement?: PLACEMENT;
+  #openTimer?: NodeJS.Timeout;
+  #closeTimer?: NodeJS.Timeout;
+  #prevPlacement?: Placement;
 
   /**
    * Constructor
@@ -122,34 +78,25 @@ export default class Popover {
     this.config = {
       ...this.#defaultConfig,
       ...config,
+      mountContainer: config.mountContainer || document.body,
     };
 
-    const { trigger, content, mountContainer, overflowHidden } = this.config;
+    const { trigger, content, mountContainer } = this.config;
 
     if (!trigger || !content) {
-      throw new Error("Invalid argument");
+      throw new Error("Invalid configuration");
     }
 
+    // create popover
     this.#createPopover();
 
+    // autoUpdate
     if (this.config.autoUpdate) {
       this.#observe();
     }
 
-    if (typeof overflowHidden !== "boolean") {
-      const isElementClipped = (element: Element) => {
-        const { overflow, overflowX, overflowY } = window.getComputedStyle(element);
-        const o = overflow + overflowY + overflowX;
-        return o.includes("hidden") || o.includes("clip");
-      };
-      this.config.overflowHidden = isElementClipped(mountContainer || document.body);
-    }
-
     if (this.#needListenScroll()) {
-      this.#scrollElements = getScrollElements(
-        trigger as HTMLElement,
-        mountContainer || document.body,
-      );
+      this.#scrollElements = this.#getScrollElements(trigger, mountContainer!);
     }
 
     this.#setAnimationClass();
@@ -178,54 +125,38 @@ export default class Popover {
       if (this.#isAnimating) {
         return;
       }
+
+      // remove existing popover when opening a new none
+      this.cleanup();
+
       this.#show();
-      this.#scrollElements?.forEach((x) => {
-        x.addEventListener("scroll", this.onScroll, { passive: true });
+      this.#scrollElements?.forEach((e) => {
+        e.addEventListener("scroll", this.onScroll, { passive: true });
       });
       document.addEventListener("click", this.#onDocClick);
     }
 
     this.opened = true;
 
-    let triggerRect = config.trigger.getBoundingClientRect() as Rect;
-    const popWrapRect = this.popoverWrapper.getBoundingClientRect();
-    const mountContainerRect = (config.mountContainer || document.body).getBoundingClientRect();
-    const arrowRect = this.arrowElement?.getBoundingClientRect();
-
-    if (config.trigger instanceof Element) {
-      triggerRect = {
-        left:
-          config.mountContainer !== document.body
-            ? triggerRect.left - mountContainerRect.left
-            : triggerRect.left,
-        top:
-          config.mountContainer !== document.body
-            ? triggerRect.top - mountContainerRect.top
-            : triggerRect.top,
-        width: triggerRect.width,
-        height: triggerRect.height,
-      };
+    if (config.trigger instanceof HTMLElement) {
       if (config.triggerOpenClass) {
-        (config.trigger as Element).classList.add(config.triggerOpenClass);
+        config.trigger.classList.add(config.triggerOpenClass);
       }
     }
 
     this.#isAnimating = true;
     if (fromHide && this.#animationClass) {
+      const { enterFrom, enterActive, enterTo } = this.#animationClass;
       if (config.onBeforeEnter) {
         config.onBeforeEnter();
       }
-      this.popoverWrapper.classList.add(this.#animationClass.enterFrom);
+      this.popoverWrapper.classList.add(enterFrom);
       this.#showRaf = requestAnimationFrame(() => {
-        this.popoverWrapper.classList.remove(this.#animationClass?.enterFrom || "");
-        this.popoverWrapper.classList.add(
-          this.#animationClass?.enterActive || "",
-          this.#animationClass?.enterTo || "",
-        );
-        const transInfo = this.#getTransitionInfo(this.popoverWrapper, this.#showTransInfo);
-        this.#showTransInfo = transInfo.info;
-        this.#clearShow = transInfo.clear;
-        transInfo.promise.then(this.#onShowTransitionEnd);
+        this.popoverWrapper.classList.remove(enterFrom || "");
+        this.popoverWrapper.classList.add(enterActive || "", enterTo || "");
+        const transitionInfo = this.#getTransitionInfo(this.popoverWrapper);
+        this.#clearShow = transitionInfo.clear;
+        transitionInfo.promise.then(this.#onShowTransitionEnd);
       });
     } else {
       requestAnimationFrame(() => {
@@ -233,58 +164,32 @@ export default class Popover {
       });
     }
 
-    const positionXY = config.useTriggerPosition
-      ? {
-          xy: [triggerRect.left, triggerRect.top],
-          placement: config.placement!,
-        }
-      : getPopoverPositionXY({
-          placement: config.placement!,
-          triggerRect,
-          popoverRect: popWrapRect,
-          arrowRect,
-          mountContainerRect,
-          translate: config.translate!,
-          autoFit: config.autoPlacement!,
-          coverTrigger: config.coverTrigger,
-          hideOnInvisible: config.hideOnInvisible,
-          overflow: config.overflowHidden,
-        });
+    const computedPosition = getPosition({
+      triggerElement: config.trigger,
+      popoverElement: this.originalElement,
+      arrowElement: this.arrowElement,
+      placement: config.placement ? config.placement : Placement.Top,
+      margin: 8,
+    });
 
-    if (config.onBeforePosition) {
-      config.onBeforePosition(positionXY);
-    }
+    const { placement, left: x, top: y, arrowLeft: arrowX, arrowTop: arrowY } = computedPosition;
 
-    if (this.#animationClass && positionXY.placement !== this.#prevPlacement) {
+    this.popoverWrapper.classList.remove(`placement-${this.#prevPlacement}`);
+    this.popoverWrapper.classList.add(`placement-${placement}`);
+
+    if (this.#animationClass && placement !== this.#prevPlacement) {
       if (this.#prevPlacement) {
         this.popoverWrapper.classList.remove(`${config.animationClass}-${this.#prevPlacement}`);
       }
-      this.#prevPlacement = positionXY.placement;
-      this.popoverWrapper.classList.add(`${config.animationClass}-${positionXY.placement}`);
+      this.popoverWrapper.classList.add(`${config.animationClass}-${placement}`);
+      this.#prevPlacement = placement;
     }
 
-    const { xy, arrowXY } = positionXY;
-    if (xy) {
-      this.originalElement.style.transform = `translate3d(${xy[0]}px,${xy[1]}px,0)`;
-      if (this.#popHide) {
-        this.#popHide = false;
-        showDomElement(this.originalElement);
-      }
-    } else if (!this.#popHide) {
-      hideDomElement(this.originalElement);
-      this.#popHide = true;
-    }
-    if (this.arrowElement) {
-      if (arrowXY) {
-        if (this.#arrowHide) {
-          this.#arrowHide = false;
-          showDomElement(this.arrowElement);
-        }
-        this.arrowElement.style.transform = `translate(${arrowXY[0]}px,${arrowXY[1]}px)`;
-      } else if (!this.#arrowHide) {
-        this.#arrowHide = true;
-        hideDomElement(this.arrowElement);
-      }
+    $showDomElement(this.originalElement);
+    $setStyle(this.originalElement, { transform: `translate3d(${x}px,${y}px,0)` });
+
+    if (config.showArrow && this.arrowElement) {
+      $setStyle(this.arrowElement, { transform: `translate(${arrowX}px,${arrowY}px)` });
     }
 
     if (fromHide && config.onOpen) {
@@ -293,10 +198,53 @@ export default class Popover {
   }
 
   /**
+   * Close the Popover instance.
+   */
+  close() {
+    const { trigger, triggerOpenClass, closeAnimation, onBeforeExit, onClose } = this.config;
+    this.closed = true;
+
+    if (this.#isAnimating || !this.opened) {
+      return;
+    }
+
+    this.opened = false;
+
+    if (closeAnimation && this.#animationClass) {
+      const { exitFrom, exitActive, exitTo } = this.#animationClass;
+      if (onBeforeExit) {
+        onBeforeExit();
+      }
+      this.popoverWrapper.classList.add(exitFrom);
+      this.#isAnimating = true;
+      this.#hideRaf = requestAnimationFrame(() => {
+        this.popoverWrapper.classList.remove(exitFrom || "");
+        this.popoverWrapper.classList.add(exitActive || "", exitTo || "");
+        const transitionInfo = this.#getTransitionInfo(this.popoverWrapper);
+        this.#clearHide = transitionInfo.clear;
+        transitionInfo.promise.then(this.#onHideTransitionEnd);
+      });
+    } else {
+      this.#hide();
+    }
+
+    if (trigger instanceof Element && triggerOpenClass) {
+      trigger.classList.remove(triggerOpenClass);
+    }
+
+    this.#removeScrollEvent();
+    this.#removeDocClick();
+    if (onClose) {
+      onClose();
+    }
+    document.removeEventListener("click", this.#onDocClick);
+  }
+
+  /**
    * Open the popover after `config.openDelay` time.
    */
   openWithDelay() {
-    this.#clearOCTimer();
+    this.#clearTimers();
     const { openDelay } = this.config;
     if (openDelay) {
       this.#openTimer = setTimeout(() => {
@@ -311,7 +259,7 @@ export default class Popover {
    * Close the popover after `config.closeDelay` time.
    */
   closeWithDelay() {
-    this.#clearOCTimer();
+    this.#clearTimers();
     const { closeDelay } = this.config;
     if (closeDelay) {
       this.#closeTimer = setTimeout(() => {
@@ -320,52 +268,6 @@ export default class Popover {
     } else {
       this.close();
     }
-  }
-
-  /**
-   * Close the Popover instance.
-   */
-  close() {
-    this.closed = true;
-    const { config } = this;
-    if (this.#isAnimating || !this.opened) {
-      return;
-    }
-
-    this.opened = false;
-
-    if (config.closeAnimation && this.#animationClass) {
-      const { onBeforeExit } = config;
-      if (onBeforeExit) {
-        onBeforeExit();
-      }
-      this.popoverWrapper.classList.add(this.#animationClass.exitFrom);
-      this.#isAnimating = true;
-      this.#hideRaf = requestAnimationFrame(() => {
-        this.popoverWrapper.classList.remove(this.#animationClass?.exitFrom || "");
-        this.popoverWrapper.classList.add(
-          this.#animationClass?.exitActive || "",
-          this.#animationClass?.exitTo || "",
-        );
-        const transInfo = this.#getTransitionInfo(this.popoverWrapper, this.#hideTransInfo);
-        this.#hideTransInfo = transInfo.info;
-        this.#clearHide = transInfo.clear;
-        transInfo.promise.then(this.#onHideTransitionEnd);
-      });
-    } else {
-      this.#hide();
-    }
-
-    if (config.trigger instanceof Element && config.triggerOpenClass) {
-      (config.trigger as Element).classList.remove(config.triggerOpenClass);
-    }
-
-    this.#removeScrollEvent();
-    this.#removeDocClick();
-    if (config.onClose) {
-      config.onClose();
-    }
-    document.removeEventListener("click", this.#onDocClick);
   }
 
   /**
@@ -381,16 +283,18 @@ export default class Popover {
    * Update config
    * @param config
    */
-  updateConfig(config: Partial<PopoverConfig>) {
-    const changed = getChangedAttrs(config, this.config, true);
+  updateConfig(newConfig: Partial<PopoverConfig>) {
+    const { trigger, triggerOpenClass, mountContainer } = this.config;
+    const changed = getChangedAttrs(newConfig, this.config, true);
+
     if (!changed.length) {
       return;
     }
 
-    const { trigger, triggerOpenClass, mountContainer, showArrow } = this.config;
     const triggerIsElement = trigger instanceof Element;
 
     changed.forEach(([k, n, o]) => {
+      // k: key, n: new,  o：old
       switch (k) {
         case "content":
           this.popoverWrapper.removeChild(o as HTMLElement);
@@ -412,11 +316,11 @@ export default class Popover {
 
         case "mountContainer":
           if (!n) {
-            config.mountContainer = document.body;
+            newConfig.mountContainer = document.body;
           }
           if (this.#resizeObserver) {
             this.#resizeObserver.unobserve(o as HTMLElement);
-            this.#resizeObserver.observe(config.mountContainer as HTMLElement);
+            this.#resizeObserver.observe(newConfig.mountContainer as HTMLElement);
           }
           break;
 
@@ -465,7 +369,7 @@ export default class Popover {
             const need = this.#needListenScroll();
             if (need) {
               if (!this.#scrollElements) {
-                this.#scrollElements = getScrollElements(trigger! as HTMLElement, mountContainer!);
+                this.#scrollElements = this.#getScrollElements(trigger, mountContainer!);
               }
             } else if (this.#scrollElements) {
               this.#removeScrollEvent();
@@ -474,19 +378,15 @@ export default class Popover {
           }
           break;
 
-        case "autoScroll":
-          //
-          break;
-
         case "closeOnScroll":
           {
             const need = this.#needListenScroll();
             if (need) {
               if (!this.#scrollElements) {
-                this.#scrollElements = getScrollElements(trigger! as HTMLElement, mountContainer!);
+                this.#scrollElements = this.#getScrollElements(trigger, mountContainer!);
                 if (this.opened) {
-                  this.#scrollElements?.forEach((x) => {
-                    x.addEventListener("scroll", this.onScroll, { passive: true });
+                  this.#scrollElements?.forEach((e) => {
+                    e.addEventListener("scroll", this.onScroll, { passive: true });
                   });
                 }
               }
@@ -500,7 +400,6 @@ export default class Popover {
         case "showArrow":
           if (n) {
             this.arrowElement = this.arrowElement || this.#createArrow();
-            this.arrowElement.appendChild(this.config.arrow || this.#builtinArrow());
             this.popoverWrapper.appendChild(this.arrowElement);
           } else {
             if (this.arrowElement && this.popoverWrapper.contains(this.arrowElement)) {
@@ -508,25 +407,6 @@ export default class Popover {
             }
             this.arrowElement = undefined;
           }
-          break;
-
-        case "arrow":
-          if (showArrow) {
-            this.arrowElement = this.arrowElement || this.#createArrow();
-            while (this.arrowElement.firstChild) {
-              if (this.arrowElement.lastChild) {
-                this.arrowElement.removeChild(this.arrowElement.lastChild);
-              }
-            }
-            this.arrowElement.appendChild((n || this.#builtinArrow()) as Node);
-            this.popoverWrapper.appendChild(this.arrowElement);
-          } else {
-            if (this.arrowElement && this.popoverWrapper.contains(this.arrowElement)) {
-              this.popoverWrapper.removeChild(this.arrowElement);
-            }
-            this.arrowElement = undefined;
-          }
-
           break;
 
         case "autoUpdate":
@@ -589,24 +469,32 @@ export default class Popover {
       this.#resizeObserver = undefined;
     }
     if (this.opened) {
-      try {
-        mountContainer!.removeChild(this.originalElement);
-        this.originalElement.style.transform = "";
-      } catch (e) {
-        //
+      if (mountContainer?.contains(this.originalElement)) {
+        mountContainer?.removeChild(this.originalElement);
       }
+      $setStyle(this.originalElement, { transform: "" });
     }
-    cancelAnimationFrame(this.#showRaf);
-    cancelAnimationFrame(this.#hideRaf);
+
+    cancelAnimationFrame(this.#showRaf!);
+    cancelAnimationFrame(this.#hideRaf!);
+
+    this.opened = false;
+    this.#isAnimating = true;
     this.#clearShow?.();
     this.#clearHide?.();
-    this.#isAnimating = true;
-    this.opened = false;
     this.#removeScrollEvent();
     this.#removeDocClick();
     this.#removeEmitEvent();
     this.#removeEnterEvent();
+
     destroy(this);
+  }
+
+  /**
+   * Remove existing popovers
+   */
+  cleanup() {
+    $removeElements(document.querySelectorAll(`.${NextPopoverId}`));
   }
 
   /**
@@ -624,23 +512,29 @@ export default class Popover {
    * Create popover dom element
    */
   #createPopover() {
-    const { content, mountContainer, wrapperClass } = this.config;
+    const { content, mountContainer, wrapperClass, showArrow } = this.config;
 
     // Positioning Element
-    this.originalElement = $("div", { id: `${NextPopoverId}_${guid()}` });
-    const { style } = this.originalElement;
-    style.position = "absolute";
-    style.left = style.top = "0";
+    this.originalElement = $({
+      tagName: "div",
+      attributes: {
+        class: NextPopoverId,
+        id: `popover-${guid()}`,
+      },
+    });
 
     // Popover wrapper
-    this.popoverWrapper = $("div", {
-      class: `${PopoverWrapperClass}${wrapperClass ? ` ${wrapperClass}` : ""}`,
+    this.popoverWrapper = $({
+      tagName: "div",
+      attributes: {
+        class: `${PopoverWrapperClass}${wrapperClass ? ` ${wrapperClass}` : ""}`,
+      },
     });
     this.originalElement.appendChild(this.popoverWrapper);
 
     // Popover mounted elements
     if (mountContainer && mountContainer !== document.body) {
-      mountContainer.style.position = "relative";
+      $setStyle(mountContainer, { position: "relative" });
     }
 
     // Popover content
@@ -648,28 +542,27 @@ export default class Popover {
       content.classList.add(PopoverContentClass);
       this.popoverWrapper.appendChild(content);
     } else {
-      const newContent = $("div", {
-        class: PopoverContentClass,
+      const newContent = $({
+        tagName: "div",
+        attributes: {
+          class: PopoverContentClass,
+        },
+        children: content.toString(),
       });
-      newContent.innerHTML = content.toString();
       this.popoverWrapper.appendChild(newContent);
     }
 
-    if (this.config.showArrow) {
+    if (showArrow) {
       this.arrowElement = this.#createArrow();
-      this.arrowElement.appendChild(this.config.arrow || this.#builtinArrow());
       this.popoverWrapper.appendChild(this.arrowElement);
     }
-    // ========================================================================
   }
 
   #createArrow() {
-    const arrowEl = $("div", { class: PopoverArrowClass });
-    const style = arrowEl.style;
-    style.position = "absolute";
-    style.left = style.top = "0";
-    // style.zIndex = "-1";
-    return arrowEl;
+    return $({
+      tagName: "div",
+      attributes: { class: PopoverArrowClass },
+    });
   }
 
   #show() {
@@ -679,8 +572,10 @@ export default class Popover {
 
   #hide() {
     const { mountContainer } = this.config;
-    mountContainer!.removeChild(this.originalElement);
-    this.originalElement.style.transform = "";
+    if (mountContainer?.contains(this.originalElement)) {
+      mountContainer!.removeChild(this.originalElement);
+    }
+    $setStyle(this.originalElement, { transform: "" });
   }
 
   #setAnimationClass() {
@@ -697,12 +592,6 @@ export default class Popover {
       : undefined;
   }
 
-  #builtinArrow() {
-    const arrow = createArrow({ tag: "i", class: PopoverArrowInnerClass });
-    arrow.classList.add("inherent");
-    return arrow;
-  }
-
   #onTriggerClick = () => {
     if (this.opened) {
       this.closeWithDelay();
@@ -712,7 +601,7 @@ export default class Popover {
   };
 
   #onTriggerEnter = () => {
-    this.#clearOCTimer();
+    this.#clearTimers();
     if (this.#isAnimating) {
       this.closed = false;
     }
@@ -722,15 +611,23 @@ export default class Popover {
     this.openWithDelay();
   };
 
-  #onTriggerLeave = () => {
-    this.#clearOCTimer();
+  #onTriggerLeave = (e: any) => {
+    const { trigger } = this.config;
+    if (
+      !this.opened ||
+      this.originalElement === e.toElement ||
+      this.originalElement.contains(e.toElement) ||
+      trigger === e.toElement ||
+      (trigger instanceof HTMLElement && trigger.contains(e.toElement))
+    ) {
+      return;
+    }
+    this.#clearTimers();
     if (this.#isAnimating) {
       this.closed = true;
     }
-    if (!this.opened) {
-      return;
-    }
     this.closeWithDelay();
+    console.log(e);
   };
 
   #onDocClick = ({ target }: MouseEvent) => {
@@ -739,11 +636,14 @@ export default class Popover {
     if (onClickOutside || clickOutsideClose) {
       if (
         this.popoverWrapper?.contains(target as HTMLElement) ||
-        (trigger instanceof Element && (trigger as HTMLElement)?.contains(target as HTMLElement))
+        (trigger instanceof HTMLElement && trigger.contains(target as HTMLElement))
       ) {
         return;
       }
-      onClickOutside?.();
+
+      if (onClickOutside) {
+        onClickOutside();
+      }
       if (clickOutsideClose) {
         this.closeWithDelay();
       }
@@ -754,7 +654,7 @@ export default class Popover {
     document.removeEventListener("click", this.#onDocClick);
   };
 
-  #clearOCTimer = () => {
+  #clearTimers = () => {
     clearTimeout(this.#openTimer);
     clearTimeout(this.#closeTimer);
   };
@@ -764,29 +664,29 @@ export default class Popover {
     const robs = (this.#resizeObserver = new ResizeObserver(() => this.update()));
     robs.observe(this.popoverWrapper);
     robs.observe(mountContainer!);
-    if (trigger instanceof Element) {
-      robs.observe(trigger as HTMLElement);
+    if (trigger instanceof HTMLElement) {
+      robs.observe(trigger);
     }
   }
 
   #addTriggerEvent() {
-    const { config } = this;
-    if (config.trigger instanceof Element && config.emit) {
-      const { trigger } = config;
-      if (config.emit === EmitType.CLICK) {
-        (trigger as HTMLElement).addEventListener("click", this.#onTriggerClick);
+    const { trigger, emit } = this.config;
+    if (trigger instanceof HTMLElement && emit) {
+      if (emit === EmitType.Click) {
+        trigger.addEventListener("click", this.#onTriggerClick);
       } else {
-        (trigger as HTMLElement).addEventListener("mouseenter", this.#onTriggerEnter);
-        (trigger as HTMLElement).addEventListener("mouseleave", this.#onTriggerLeave);
+        trigger.addEventListener("mouseenter", this.#onTriggerEnter);
+        trigger.addEventListener("mouseleave", this.#onTriggerLeave);
       }
     }
   }
 
   #addEnterEvent() {
-    const { config } = this;
-    if (config.enterable && config.emit === EmitType.HOVER) {
-      this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
-      this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
+    const { enterable, emit } = this.config;
+    if (enterable && emit === EmitType.Hover) {
+      // TODO: fix me
+      // this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
+      // this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
     }
   }
 
@@ -797,21 +697,46 @@ export default class Popover {
 
   #removeEmitEvent(element?: HTMLElement) {
     element = element || (this.config.trigger as HTMLElement);
-    if (element instanceof Element) {
-      (element as HTMLElement).removeEventListener("click", this.#onTriggerClick);
-      (element as HTMLElement).removeEventListener("mouseenter", this.#onTriggerEnter);
-      (element as HTMLElement).removeEventListener("mouseleave", this.#onTriggerLeave);
+    if (element instanceof HTMLElement) {
+      element.removeEventListener("click", this.#onTriggerClick);
+      element.removeEventListener("mouseenter", this.#onTriggerEnter);
+      element.removeEventListener("mouseleave", this.#onTriggerLeave);
     }
   }
 
   #removeScrollEvent() {
-    this.#scrollElements?.forEach((x) => x.removeEventListener("scroll", this.onScroll));
+    this.#scrollElements?.forEach((e) => e.removeEventListener("scroll", this.onScroll));
   }
 
-  #getTransitionInfo(element: Element, info?: TransitionInfo) {
+  #getTransitionInfo(element: HTMLElement) {
+    const transitionDelays = $getStyleProperties(element, "transitionDelay");
+    const transitionDurations = $getStyleProperties(element, "transitionDuration");
+    const animationDelays = $getStyleProperties(element, "animationDelay");
+    const animationDurations = $getStyleProperties(element, "animationDuration");
+
+    function getTimeout(delays: string[], durations: string[]): number {
+      const toMs = (s: string): number => {
+        return Number(s.slice(0, -1).replace(",", ".")) * 1000;
+      };
+      while (delays.length < durations.length) {
+        delays = delays.concat(delays);
+      }
+      return Math.max(...durations.map((d, i) => toMs(d) + toMs(delays[i])));
+    }
+
+    const transitionTimeout = getTimeout(transitionDelays, transitionDurations);
+    const animationTimeout = getTimeout(animationDelays, animationDurations);
+
+    const timeout = Math.max(transitionTimeout, animationTimeout);
+
+    let event: undefined | string;
+    if (timeout > 0) {
+      event = transitionTimeout > animationTimeout ? "transitionend" : "animationend";
+    }
+
     let clear: undefined | (() => void);
+
     const promise = new Promise((resolve) => {
-      const { event, timeout } = info || getTransitionInfo(element);
       if (timeout) {
         const fn = () => {
           clear?.();
@@ -834,16 +759,13 @@ export default class Popover {
     return {
       promise,
       clear,
-      info,
     };
   }
 
   #onShowTransitionEnd = () => {
     const { onEntered } = this.config;
-    this.popoverWrapper.classList.remove(
-      this.#animationClass!.enterActive,
-      this.#animationClass!.enterTo,
-    );
+    const { enterActive, enterTo } = this.#animationClass || {};
+    this.popoverWrapper.classList.remove(enterActive!, enterTo!);
     this.#isAnimating = false;
     if (onEntered) {
       onEntered();
@@ -854,13 +776,10 @@ export default class Popover {
   };
 
   #onHideTransitionEnd = () => {
-    const { config } = this;
-    const { onExited } = config;
+    const { onExited } = this.config;
+    const { exitActive, exitTo } = this.#animationClass || {};
     this.#hide();
-    this.popoverWrapper.classList.remove(
-      this.#animationClass!.exitActive,
-      this.#animationClass!.exitTo,
-    );
+    this.popoverWrapper.classList.remove(exitActive!, exitTo!);
     this.#isAnimating = false;
     if (onExited) {
       onExited();
@@ -871,7 +790,30 @@ export default class Popover {
   };
 
   #needListenScroll() {
-    const { trigger, mountContainer, autoScroll, closeOnScroll } = this.config;
-    return trigger instanceof Element && mountContainer && (autoScroll || closeOnScroll);
+    const { trigger, mountContainer } = this.config;
+    return trigger instanceof HTMLElement && mountContainer;
+  }
+
+  /**
+   * Get scroll elements
+   * @param element HTMLElement
+   * @param mountContainer HTMLElement
+   * @returns HTMLElement[]
+   */
+  #getScrollElements(
+    element: HTMLElement | { getBoundingClientRect: () => RectInfo },
+    mountContainer: HTMLElement,
+  ) {
+    const scrollElements: HTMLElement[] = [];
+    const isScrollElement = (el: HTMLElement) => {
+      return el.scrollHeight > el.offsetHeight || el.scrollWidth > el.offsetWidth;
+    };
+    while (element instanceof HTMLElement && element !== mountContainer) {
+      if (isScrollElement(element)) {
+        scrollElements.push(element);
+      }
+      element = element.parentElement!;
+    }
+    return scrollElements;
   }
 }

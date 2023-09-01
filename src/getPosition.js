@@ -1,7 +1,7 @@
-import { $setData, $setStyle } from "./utils";
+import { $setStyle } from "./utils";
 
 // getm more visible sides
-function getMoreVisibleSides($element) {
+const getMoreVisibleSides = ($element) => {
   if (!$element) {
     return {};
   }
@@ -22,10 +22,10 @@ function getMoreVisibleSides($element) {
     horizontal,
     vertical,
   };
-}
+};
 
 // get absolute coords of the element
-function getAbsoluteCoords($element) {
+const getAbsoluteCoords = ($element) => {
   if (!$element) {
     return;
   }
@@ -50,7 +50,7 @@ function getAbsoluteCoords($element) {
     bottom: boxRect.bottom + pageY,
     left: boxRect.left + pageX,
   };
-}
+};
 
 /**
  * compute popover position
@@ -66,10 +66,8 @@ export default function getPosition({
   arrowElement,
   // Placement of popover(top, bottom, left, right, auto), default auto
   placement = "auto",
-  // Space between popover and its activator (in pixel), default 8
-  margin = 8,
-  // Space between popover and window edge (in pixel), default 5
-  offset = 5,
+  // Space between popover and its activator (in pixel), default 0
+  margin = 0,
   // Distance to translate on show/hide animation (in pixel), default 10
   transitionDistance = 10,
 }) {
@@ -80,9 +78,6 @@ export default function getPosition({
 
   // reset popover style
   $setStyle(popoverElement, {
-    position: "absolute",
-    left: "0",
-    top: "0",
     transform: "",
   });
 
@@ -190,10 +185,10 @@ export default function getPosition({
   let top = placementsValue[placement].top;
   let left = placementsValue[placement].left;
 
-  const topEdge = window.scrollY - popoverElementTop + (offset || 0);
-  const bottomEdge = window.innerHeight + topEdge - (offset || 0);
-  const leftEdge = window.scrollX - popoverElementLeft + (offset || 0);
-  const rightEdge = window.innerWidth + leftEdge - (offset || 0);
+  const topEdge = window.scrollY - popoverElementTop;
+  const bottomEdge = window.innerHeight + topEdge;
+  const leftEdge = window.scrollX - popoverElementLeft;
+  const rightEdge = window.innerWidth + leftEdge;
 
   // inverse placement
   let inversePlacement;
@@ -291,6 +286,12 @@ export default function getPosition({
 
     if (mainPlacement === "top" || mainPlacement === "bottom") {
       arrowLeft = triggerElementWidthCenter - fullLeft;
+      if (inversePlacement) {
+        arrowTop = mainPlacement === "top" ? 0 : popoverElementHeight;
+      } else {
+        arrowTop = mainPlacement === "top" ? popoverElementHeight : 0;
+      }
+
       /** if arrow crossed left edge of popover element */
       if (arrowLeft < arrowWidthHalf) {
         arrowLeft = arrowWidthHalf;
@@ -300,6 +301,12 @@ export default function getPosition({
       }
     } else if (mainPlacement === "left" || mainPlacement === "right") {
       arrowTop = triggerElementHeightCenter - fullTop;
+      if (inversePlacement) {
+        arrowLeft = mainPlacement === "left" ? 0 : popoverElementWidth;
+      } else {
+        arrowLeft = mainPlacement === "left" ? popoverElementWidth : 0;
+      }
+
       /** if arrow crossed top edge of popover element */
       if (arrowTop < arrowWidthHalf) {
         arrowTop = arrowWidthHalf;

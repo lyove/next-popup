@@ -49,7 +49,7 @@ export function $<T extends HTMLElement>({
 }
 
 /**
- * remove dom element
+ * remove dom children element
  * @param dom
  */
 export function $clearChildren(dom: Element) {
@@ -58,6 +58,38 @@ export function $clearChildren(dom: Element) {
       dom.removeChild(dom.lastChild);
     }
   }
+}
+
+/**
+ * remove dom NodeList
+ * @param $elements
+ */
+export function $removeElements($elements: NodeList) {
+  Array.from($elements).forEach((element) => {
+    if (element.parentElement) {
+      element.parentElement?.removeChild(element);
+    }
+  });
+}
+
+/**
+ * Show element
+ * @param element HTMLElement
+ */
+export function $showDomElement(element: HTMLElement) {
+  const { style } = element;
+  style.opacity = "1";
+  style.pointerEvents = "auto";
+}
+
+/**
+ * Hide element
+ * @param element HTMLElement
+ */
+export function $hideDomElement(element: HTMLElement) {
+  const { style } = element;
+  style.opacity = "0";
+  style.pointerEvents = "none";
 }
 
 /**
@@ -92,4 +124,15 @@ export function $setData($element: HTMLElement, data: { [key: string]: any }) {
       $element.dataset[key] = val;
     }
   });
+}
+
+/**
+ * get style properties
+ * @param $element HTMLElement
+ * @param key string
+ * @returns string
+ */
+export function $getStyleProperties($element: HTMLElement, key: string) {
+  const styles = window.getComputedStyle($element);
+  return (styles as any)[key]?.split(", ");
 }

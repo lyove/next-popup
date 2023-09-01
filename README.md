@@ -25,21 +25,22 @@ or via CDN
 ## Usage
 
 ```js
-import Popover, { PLACEMENT, EmitType } from 'next-popover'
+import Popover, { Placement, EmitType } from 'next-popover'
 
-const mountContainer = document.querySelector('.mount-container'); // default: document.body
 const trigger = document.querySelector('.trigger'); 
 
 const content = document.createElement('div'); // You need to pop up the displayed content
 content.classList.add('content');
 content.innerHTML = "Hello Next-Popover";
 
+const mountContainer = document.querySelector('.mount-container'); // default: document.body
+
 const popover = new Popover({
-  mountContainer,
   trigger, // required
   content, // required
-  placement: PLACEMENT.T, // Set the position of the popover
-  emit: EmitType.HOVER // Set to open the popover when the mouse hovers over the trigger
+  mountContainer,
+  placement: Placement.Top, // Set the position of the popover
+  emit: EmitType.Hover // Set to open the popover when the mouse hovers over the trigger
 });
 
 trigger.onclick = () => {
@@ -75,7 +76,7 @@ Popover will add the following 6 classes through the animationClass.
 `${animationClass}-exit-from` // Starts hiding and is removed in the next frame.
 `${animationClass}-exit-active` // Added in the next frame and removed when the animation ends.
 `${animationClass}-exit-to` // Added in the next frame and removed when the animation ends.
-`${animationClass}-${PLACEMENT}` // Current popover placement
+`${animationClass}-${Placement}` // Current popover placement
 ```
 
 You can write CSS styles like this:
@@ -92,51 +93,15 @@ You can write CSS styles like this:
 }
 ```
 
-### Arrow
-
-The arrow parameter allows you to add a custom arrow element.
-
-```js
-const arrow = document.createElement('div');
-arrow.classList.add('arrow');
-
-const popover = new Popover({
-  arrow
-});
-```
-
-```css
-.arrow {
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
-  background: #000;
-}
-```
-
-Alternatively, an arrow can be quickly created using the built-in `createArrow` function.
-
-```ts
-import Popover, { createArrow } from 'next-popover';
-
-const popover = new Popover({
-  arrow: createArrow({ background: '#000' })
-});
-```
-
 ### Scroll
-
-The autoScroll parameter controls whether the popover automatically scrolls with the trigger element when it is scrolled.
 
 The closeOnScroll parameter controls whether the popover automatically closes when the trigger element is scrolled.
 
-The hideOnInvisible parameter controls whether the popover automatically hides when the trigger element is not visible on the screen.
+<!-- The hideOnInvisible parameter controls whether the popover automatically hides when the trigger element is not visible on the screen. -->
 
 ### AutoUpdate
 
 The autoUpdate parameter controls whether the popover's position is automatically updated when the size of the mount container, content, or trigger element changes. This feature relies on the [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
-
-The autoPlacement parameter controls whether the popover's position is automatically adjusted to ensure that it is fully displayed when there is not enough space.
 
 ### Hook
 
@@ -155,19 +120,6 @@ new Popover({
   },
   onExited() {
     // Executed after the CSS hide animation completes.
-  },
-  onBeforePosition(positionXY) {
-    // Executed before setting the popover's position.
-    // positionXY.position: the final display position.
-    // positionXY.xy: the position of the popover, undefined means not displayed.
-    // positionXY.arrowXY: the position of the arrow, undefined means not displayed.
-    // You can modify xy and arrowXY directly to change the final position.
-    if (positionXY.xy) {
-      positionXY.xy[0] += 10;
-    }
-    if (positionXY.arrowXY) {
-      positionXY.arrowXY[0] += 10;
-    }
   },
   onOpen() {
     // Executed when the popover is displayed.
@@ -206,15 +158,12 @@ canvas.on('scroll', () => popover.onScroll());
 | Name | Type | Default | Description |
 | -- | -- | -- | -- |
 | `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `Required`. The trigger element |
-| `content` | `Element` | | `Required`. The content element to be popped up |
+| `content` | `Element \| string` | | `Required`. The content element to be popped up |
 | `mountContainer` | `HTMLElement` | `document.body` | Mount container for popover. |
 | `showArrow` | `Boolean` | `true` | Whether to show arrow |
 | `arrow` | `Element` | | The arrow element. |
-| `placement` | `PLACEMENT` | `PLACEMENT.T` | The placement of the popover. |
-| `translate` | `[number, number]` | `[0, 0]` | The custom xy offset. |
-| `autoPlacement` | `boolean` | `true` | Whether to automatically switch the position when there is not enough space. |
+| `placement` | `Placement` | `Placement.Top` | The placement of the popover. |
 | `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the mount container, content, or trigger size changes. |
-| `autoScroll` | `boolean` | `true` | Whether to automatically follow the trigger element when it is scrolled. |
 | `animationClass` | `string` | | The CSS animation class name. |
 | `emit` | `EmitType` |  | Trigger emit type |
 | `clickOutsideClose` | `boolean` | `true` | Automatically close the popover when clicking outside |
@@ -224,17 +173,13 @@ canvas.on('scroll', () => popover.onScroll());
 | `disabled` | `boolean` | | Disabled |
 | `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popover is opened. |
 | `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popover |
-| `overflowHidden` | `boolean` | automatically detected | Whether the mount container has overflow hidden. |
-| `coverTrigger` | `boolean` | | Whether to cover the trigger element with the popover. |
 | `closeOnScroll` | `boolean` | | Whether to automatically close the popover when the trigger element is scrolled. |
-| `hideOnInvisible` | `boolean` | | Whether to automatically hide the popover when the trigger element is invisible on the screen. |
 | `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popover coordinates | 
 | `closeAnimation` | `boolean` | `true` | Whether to animate when closing |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
 | `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |
 | `onExited` | `() => void` | | Called when the CSS exit animation ends. |
-| `onBeforePosition` | `(positionXY: PositionXY) => void` | | Called before setting the position of the popover. You can modify the pos object to set the final position of the popover. |
 | `onOpen` | `() => void` | | Called when the popover is opened. |
 | `onClose` | `() => void` | |Called when the popover is closed. |
 | `onClickOutside` | `() => void` | | When the popover is closed. |
@@ -243,10 +188,11 @@ canvas.on('scroll', () => popover.onScroll());
 
 | Name | Type | Description |
 | -- | -- | -- |
-| `el` | `HTMLElement` | The popover element |
 | `config` | `PopoverConfig` | Popover configuration object |
+| `originalElement` | `HTMLElement` | The popover outer element |
+| `popoverWrapper` | `HTMLElement` | The popover wrapper element |
+| `arrowElement` | `HTMLElement` | The popover arrow element |
 | `opened` | `boolean` | Indicates whether the popover is currently displayed |
-| `isAnimating` | `boolean` | Indicates whether a CSS animation is currently in progress |
 
 ### Methods
 
@@ -336,24 +282,4 @@ Manually update the position of the Popover instance.
 
 ```ts
 update(): void;
-```
-
-### Utils
-
-Popover also provides utility methods for quickly creating `arrow` elements.
-
-```ts
-import Popover, { createArrow } from 'next-popover'
-
-new Popover({
-  arrow: createArrow()
-})
-```
-
-#### createArrow()
-
-Quickly create `arrow` DOM elements that can accept CSS style objects and class names as parameters.
-
-```ts
-createArrow(style?: CSSStyleDeclaration, className?: string): HTMLElement;
 ```

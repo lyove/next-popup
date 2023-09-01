@@ -206,7 +206,6 @@ canvas.on('scroll', () => popover.onScroll());
 | `triggerOpenClass` | `string` | | 弹窗开启时给 `trigger` 添加的 `class` |
 | `enterable` | `boolean` | `true` | 当 `emit` 等于 `hover` 时，鼠标是否可进入弹出层 |
 | `closeOnScroll` | `boolean` | | 是否在滚动时自动关闭 |
-<!-- | `hideOnInvisible` | `boolean` | | 让 trigger 元素在屏幕上不可以见时自动隐藏弹出层 | -->
 | `useTriggerPos` | `boolean` | | 使用 `trigger` 参数返回的 `left` 和 `top` 作为弹框坐标 |
 | `closeAnimation` | `boolean` | `true` | 是否需要关闭动画 |
 | `onBeforeEnter` | `() => void` | | css 进入动画开始之前 |

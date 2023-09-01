@@ -8,7 +8,7 @@ export const PopoverArrowClass = "popover-arrow";
 
 export const PopoverArrowInnerClass = "arrow";
 
-export enum PLACEMENT {
+export enum Placement {
   "Top" = "top",
   "TopStart" = "top-start",
   "TopEnd" = "top-end",

@@ -1,9 +1,9 @@
-import type { PopoverConfig, AnimationClass, TransitionInfo, RectInfo } from "./type";
+import type { PopoverConfig, AnimationClass, RectInfo } from "./type";
+import getPosition from "./getPosition";
 import {
   $,
   $showDomElement,
-  $hideDomElement,
-  $removeElement,
+  $removeElements,
   $setStyle,
   $getStyleProperties,
   destroy,
@@ -11,7 +11,6 @@ import {
   getChangedAttrs,
   guid,
 } from "./utils";
-import getPosition from "./getPosition";
 import {
   NextPopoverId,
   PopoverWrapperClass,
@@ -52,14 +51,6 @@ export default class Popover {
   #isAnimating = false;
   #showRaf?: number;
   #hideRaf?: number;
-  #showTransInfo?: {
-    event?: "animationend" | "transitionend" | undefined;
-    timeout: number;
-  };
-  #hideTransInfo?: {
-    event?: "animationend" | "transitionend" | undefined;
-    timeout: number;
-  };
   #clearShow?: () => void;
   #clearHide?: () => void;
   #scrollElements?: HTMLElement[];
@@ -133,6 +124,10 @@ export default class Popover {
       if (this.#isAnimating) {
         return;
       }
+
+      // remove existing popover when opening a new none
+      this.cleanup();
+
       this.#show();
       this.#scrollElements?.forEach((e) => {
         e.addEventListener("scroll", this.onScroll, { passive: true });
@@ -158,10 +153,9 @@ export default class Popover {
       this.#showRaf = requestAnimationFrame(() => {
         this.popoverWrapper.classList.remove(enterFrom || "");
         this.popoverWrapper.classList.add(enterActive || "", enterTo || "");
-        const transition = this.#getTransitionInfo(this.popoverWrapper, this.#showTransInfo);
-        this.#showTransInfo = transition.transInfo;
-        this.#clearShow = transition.clear;
-        transition.promise.then(this.#onShowTransitionEnd);
+        const transitionInfo = this.#getTransitionInfo(this.popoverWrapper);
+        this.#clearShow = transitionInfo.clear;
+        transitionInfo.promise.then(this.#onShowTransitionEnd);
       });
     } else {
       requestAnimationFrame(() => {
@@ -188,7 +182,6 @@ export default class Popover {
 
     $showDomElement(this.originalElement);
     $setStyle(this.originalElement, { transform: `translate3d(${x}px,${y}px,0)` });
-    $showDomElement(this.originalElement);
 
     if (config.showArrow && this.arrowElement) {
       $setStyle(this.arrowElement, { transform: `translate(${arrowX}px,${arrowY}px)` });
@@ -223,10 +216,9 @@ export default class Popover {
       this.#hideRaf = requestAnimationFrame(() => {
         this.popoverWrapper.classList.remove(exitFrom || "");
         this.popoverWrapper.classList.add(exitActive || "", exitTo || "");
-        const transition = this.#getTransitionInfo(this.popoverWrapper, this.#hideTransInfo);
-        this.#hideTransInfo = transition.transInfo;
-        this.#clearHide = transition.clear;
-        transition.promise.then(this.#onHideTransitionEnd);
+        const transitionInfo = this.#getTransitionInfo(this.popoverWrapper);
+        this.#clearHide = transitionInfo.clear;
+        transitionInfo.promise.then(this.#onHideTransitionEnd);
       });
     } else {
       this.#hide();
@@ -248,7 +240,7 @@ export default class Popover {
    * Open the popover after `config.openDelay` time.
    */
   openWithDelay() {
-    this.#clearOCTimer();
+    this.#clearTimers();
     const { openDelay } = this.config;
     if (openDelay) {
       this.#openTimer = setTimeout(() => {
@@ -263,7 +255,7 @@ export default class Popover {
    * Close the popover after `config.closeDelay` time.
    */
   closeWithDelay() {
-    this.#clearOCTimer();
+    this.#clearTimers();
     const { closeDelay } = this.config;
     if (closeDelay) {
       this.#closeTimer = setTimeout(() => {
@@ -473,24 +465,32 @@ export default class Popover {
       this.#resizeObserver = undefined;
     }
     if (this.opened) {
-      try {
+      if (mountContainer?.contains(this.originalElement)) {
         mountContainer?.removeChild(this.originalElement);
-        $setStyle(this.originalElement, { transform: "" });
-      } catch (e) {
-        //
       }
+      $setStyle(this.originalElement, { transform: "" });
     }
+
     cancelAnimationFrame(this.#showRaf!);
     cancelAnimationFrame(this.#hideRaf!);
+
+    this.opened = false;
+    this.#isAnimating = true;
     this.#clearShow?.();
     this.#clearHide?.();
-    this.#isAnimating = true;
-    this.opened = false;
     this.#removeScrollEvent();
     this.#removeDocClick();
     this.#removeEmitEvent();
     this.#removeEnterEvent();
+
     destroy(this);
+  }
+
+  /**
+   * Remove existing popovers
+   */
+  cleanup() {
+    $removeElements(document.querySelectorAll(`.${NextPopoverId}`));
   }
 
   /**
@@ -513,12 +513,9 @@ export default class Popover {
     // Positioning Element
     this.originalElement = $({
       tagName: "div",
-      // attributes: { id: `${NextPopoverId}_${guid()}` },
-      attributes: { id: NextPopoverId },
-      style: {
-        position: "absolute",
-        left: "0",
-        top: "0",
+      attributes: {
+        class: NextPopoverId,
+        id: `popover-${guid()}`,
       },
     });
 
@@ -559,17 +556,10 @@ export default class Popover {
   }
 
   #createArrow() {
-    const arrow = $({
+    return $({
       tagName: "div",
       attributes: { class: PopoverArrowClass },
-      style: {
-        position: "absolute",
-        left: "0",
-        top: "0",
-        // zIndex: "-1",
-      },
     });
-    return arrow;
   }
 
   #show() {
@@ -579,7 +569,9 @@ export default class Popover {
 
   #hide() {
     const { mountContainer } = this.config;
-    mountContainer!.removeChild(this.originalElement);
+    if (mountContainer?.contains(this.originalElement)) {
+      mountContainer!.removeChild(this.originalElement);
+    }
     $setStyle(this.originalElement, { transform: "" });
   }
 
@@ -603,12 +595,6 @@ export default class Popover {
       attributes: {
         class: `${PopoverArrowInnerClass} builtin`,
       },
-      style: {
-        width: "10px",
-        height: "10px",
-        transform: "rotate(45deg)",
-        transformOrigin: "center",
-      },
     });
   }
 
@@ -621,7 +607,7 @@ export default class Popover {
   };
 
   #onTriggerEnter = () => {
-    this.#clearOCTimer();
+    this.#clearTimers();
     if (this.#isAnimating) {
       this.closed = false;
     }
@@ -632,7 +618,7 @@ export default class Popover {
   };
 
   #onTriggerLeave = () => {
-    this.#clearOCTimer();
+    this.#clearTimers();
     if (this.#isAnimating) {
       this.closed = true;
     }
@@ -666,7 +652,7 @@ export default class Popover {
     document.removeEventListener("click", this.#onDocClick);
   };
 
-  #clearOCTimer = () => {
+  #clearTimers = () => {
     clearTimeout(this.#openTimer);
     clearTimeout(this.#closeTimer);
   };
@@ -719,42 +705,35 @@ export default class Popover {
     this.#scrollElements?.forEach((e) => e.removeEventListener("scroll", this.onScroll));
   }
 
-  #getTransitionInfo(element: HTMLElement, transInfo?: TransitionInfo) {
+  #getTransitionInfo(element: HTMLElement) {
+    const transitionDelays = $getStyleProperties(element, "transitionDelay");
+    const transitionDurations = $getStyleProperties(element, "transitionDuration");
+    const animationDelays = $getStyleProperties(element, "animationDelay");
+    const animationDurations = $getStyleProperties(element, "animationDuration");
+
+    function getTimeout(delays: string[], durations: string[]): number {
+      const toMs = (s: string): number => {
+        return Number(s.slice(0, -1).replace(",", ".")) * 1000;
+      };
+      while (delays.length < durations.length) {
+        delays = delays.concat(delays);
+      }
+      return Math.max(...durations.map((d, i) => toMs(d) + toMs(delays[i])));
+    }
+
+    const transitionTimeout = getTimeout(transitionDelays, transitionDurations);
+    const animationTimeout = getTimeout(animationDelays, animationDurations);
+
+    const timeout = Math.max(transitionTimeout, animationTimeout);
+
+    let event: undefined | string;
+    if (timeout > 0) {
+      event = transitionTimeout > animationTimeout ? "transitionend" : "animationend";
+    }
+
     let clear: undefined | (() => void);
 
-    const getTransInfo = (el: HTMLElement): TransitionInfo => {
-      const getTimeout = (delays: string[], durations: string[]): number => {
-        const toMs = (s: string): number => {
-          return Number(s.slice(0, -1).replace(",", ".")) * 1000;
-        };
-        while (delays.length < durations.length) {
-          delays = delays.concat(delays);
-        }
-        return Math.max(...durations.map((d, i) => toMs(d) + toMs(delays[i])));
-      };
-
-      const transitionDelays = $getStyleProperties(el, "transitionDelay");
-      const transitionDurations = $getStyleProperties(el, "transitionDuration");
-      const animationDelays = $getStyleProperties(el, "animationDelay");
-      const animationDurations = $getStyleProperties(el, "animationDuration");
-
-      const transitionTimeout = getTimeout(transitionDelays, transitionDurations);
-      const animationTimeout = getTimeout(animationDelays, animationDurations);
-      const timeout = Math.max(transitionTimeout, animationTimeout);
-
-      return {
-        event:
-          timeout > 0
-            ? transitionTimeout > animationTimeout
-              ? "transitionend"
-              : "animationend"
-            : undefined,
-        timeout,
-      };
-    };
-
     const promise = new Promise((resolve) => {
-      const { event, timeout } = transInfo || getTransInfo(element);
       if (timeout) {
         const fn = () => {
           clear?.();
@@ -777,7 +756,6 @@ export default class Popover {
     return {
       promise,
       clear,
-      transInfo,
     };
   }
 

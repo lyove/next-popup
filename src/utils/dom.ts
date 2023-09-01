@@ -64,7 +64,7 @@ export function $clearChildren(dom: Element) {
  * remove dom NodeList
  * @param $elements
  */
-export function $removeElement($elements: NodeList) {
+export function $removeElements($elements: NodeList) {
   Array.from($elements).forEach((element) => {
     if (element.parentElement) {
       element.parentElement?.removeChild(element);

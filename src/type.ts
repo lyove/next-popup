@@ -1,4 +1,4 @@
-import type { EmitType, PLACEMENT } from "./constant";
+import type { EmitType, Placement } from "./constant";
 
 export interface PopoverConfig {
   trigger: HTMLElement | { getBoundingClientRect: () => RectInfo };
@@ -6,7 +6,7 @@ export interface PopoverConfig {
   mountContainer?: HTMLElement;
   triggerOpenClass?: string;
   wrapperClass?: string;
-  placement?: PLACEMENT;
+  placement?: Placement;
   showArrow?: boolean;
   emit?: EmitType;
   clickOutsideClose?: boolean;
@@ -18,7 +18,6 @@ export interface PopoverConfig {
   autoUpdate?: boolean;
   animationClass?: string;
   closeOnScroll?: boolean;
-  // hideOnInvisible?: boolean;
   closeAnimation?: boolean;
   onBeforeEnter?: () => void;
   onEntered?: () => void;

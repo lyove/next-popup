@@ -25,7 +25,7 @@ or via CDN
 ## Usage
 
 ```js
-import Popover, { PLACEMENT, EmitType } from 'next-popover'
+import Popover, { Placement, EmitType } from 'next-popover'
 
 const mountContainer = document.querySelector('.mount-container'); // default: document.body
 const trigger = document.querySelector('.trigger'); 
@@ -38,7 +38,7 @@ const popover = new Popover({
   mountContainer,
   trigger, // required
   content, // required
-  placement: PLACEMENT.Top, // Set the position of the popover
+  placement: Placement.Top, // Set the position of the popover
   emit: EmitType.Hover // Set to open the popover when the mouse hovers over the trigger
 });
 
@@ -75,7 +75,7 @@ Popover will add the following 6 classes through the animationClass.
 `${animationClass}-exit-from` // Starts hiding and is removed in the next frame.
 `${animationClass}-exit-active` // Added in the next frame and removed when the animation ends.
 `${animationClass}-exit-to` // Added in the next frame and removed when the animation ends.
-`${animationClass}-${PLACEMENT}` // Current popover placement
+`${animationClass}-${Placement}` // Current popover placement
 ```
 
 You can write CSS styles like this:
@@ -193,7 +193,7 @@ canvas.on('scroll', () => popover.onScroll());
 | `mountContainer` | `HTMLElement` | `document.body` | Mount container for popover. |
 | `showArrow` | `Boolean` | `true` | Whether to show arrow |
 | `arrow` | `Element` | | The arrow element. |
-| `placement` | `PLACEMENT` | `PLACEMENT.Top` | The placement of the popover. |
+| `placement` | `Placement` | `Placement.Top` | The placement of the popover. |
 | `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the mount container, content, or trigger size changes. |
 | `animationClass` | `string` | | The CSS animation class name. |
 | `emit` | `EmitType` |  | Trigger emit type |

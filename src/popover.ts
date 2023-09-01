@@ -284,7 +284,7 @@ export default class Popover {
    * @param config
    */
   updateConfig(newConfig: Partial<PopoverConfig>) {
-    const { trigger, triggerOpenClass, mountContainer, showArrow } = this.config;
+    const { trigger, triggerOpenClass, mountContainer } = this.config;
     const changed = getChangedAttrs(newConfig, this.config, true);
 
     if (!changed.length) {
@@ -294,6 +294,7 @@ export default class Popover {
     const triggerIsElement = trigger instanceof Element;
 
     changed.forEach(([k, n, o]) => {
+      // k: key, n: new,  o：old
       switch (k) {
         case "content":
           this.popoverWrapper.removeChild(o as HTMLElement);

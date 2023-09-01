@@ -118,7 +118,10 @@ header span {
 
 .configure {
   width: 800px;
+  box-sizing: border-box;
   margin: 24px auto;
+  padding: 12px;
+  background: #fff;
 }
 
 .configure.translate .flex,

@@ -16,11 +16,10 @@ import {
   PopoverWrapperClass,
   PopoverContentClass,
   PopoverArrowClass,
-  PopoverArrowInnerClass,
   EmitType,
   Placement,
 } from "./constant";
-import "./style.css";
+import "./style/index.scss";
 
 export { $, EmitType, Placement };
 
@@ -170,9 +169,13 @@ export default class Popover {
       popoverElement: this.originalElement,
       arrowElement: this.arrowElement,
       placement: config.placement ? config.placement : Placement.Top,
+      margin: 8,
     });
 
     const { placement, left: x, top: y, arrowLeft: arrowX, arrowTop: arrowY } = computedPosition;
+
+    this.popoverWrapper.classList.remove(`placement-${this.#prevPlacement}`);
+    this.popoverWrapper.classList.add(`placement-${placement}`);
 
     if (this.#animationClass && placement !== this.#prevPlacement) {
       if (this.#prevPlacement) {
@@ -187,7 +190,6 @@ export default class Popover {
 
     if (config.showArrow && this.arrowElement) {
       $setStyle(this.arrowElement, { transform: `translate(${arrowX}px,${arrowY}px)` });
-      $showDomElement(this.arrowElement);
     }
 
     if (fromHide && config.onOpen) {
@@ -397,7 +399,6 @@ export default class Popover {
         case "showArrow":
           if (n) {
             this.arrowElement = this.arrowElement || this.#createArrow();
-            this.arrowElement.appendChild(this.#builtinArrow());
             this.popoverWrapper.appendChild(this.arrowElement);
           } else {
             if (this.arrowElement && this.popoverWrapper.contains(this.arrowElement)) {
@@ -552,7 +553,6 @@ export default class Popover {
 
     if (showArrow) {
       this.arrowElement = this.#createArrow();
-      this.arrowElement.appendChild(this.#builtinArrow());
       this.popoverWrapper.appendChild(this.arrowElement);
     }
   }
@@ -591,15 +591,6 @@ export default class Popover {
       : undefined;
   }
 
-  #builtinArrow() {
-    return $({
-      tagName: "i",
-      attributes: {
-        class: `${PopoverArrowInnerClass} builtin`,
-      },
-    });
-  }
-
   #onTriggerClick = () => {
     if (this.opened) {
       this.closeWithDelay();
@@ -619,15 +610,23 @@ export default class Popover {
     this.openWithDelay();
   };
 
-  #onTriggerLeave = () => {
+  #onTriggerLeave = (e: any) => {
+    const { trigger } = this.config;
+    if (
+      !this.opened ||
+      this.originalElement === e.toElement ||
+      this.originalElement.contains(e.toElement) ||
+      trigger === e.toElement ||
+      (trigger instanceof HTMLElement && trigger.contains(e.toElement))
+    ) {
+      return;
+    }
     this.#clearTimers();
     if (this.#isAnimating) {
       this.closed = true;
     }
-    if (!this.opened) {
-      return;
-    }
     this.closeWithDelay();
+    console.log(e);
   };
 
   #onDocClick = ({ target }: MouseEvent) => {
@@ -684,8 +683,9 @@ export default class Popover {
   #addEnterEvent() {
     const { enterable, emit } = this.config;
     if (enterable && emit === EmitType.Hover) {
-      this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
-      this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
+      // TODO: fix me
+      // this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
+      // this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
     }
   }
 

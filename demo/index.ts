@@ -14,7 +14,7 @@ window.onload = function () {
 
   // default
   const singleConfig = {
-    mountContainer: mountElement,
+    // mountContainer: mountElement,
     content,
     trigger: trigger,
     wrapperClass: "test-popover",

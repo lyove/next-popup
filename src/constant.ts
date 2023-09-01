@@ -6,8 +6,6 @@ export const PopoverContentClass = "popover-content";
 
 export const PopoverArrowClass = "popover-arrow";
 
-export const PopoverArrowInnerClass = "arrow";
-
 export enum Placement {
   "Top" = "top",
   "TopStart" = "top-start",

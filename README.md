@@ -27,17 +27,18 @@ or via CDN
 ```js
 import Popover, { Placement, EmitType } from 'next-popover'
 
-const mountContainer = document.querySelector('.mount-container'); // default: document.body
 const trigger = document.querySelector('.trigger'); 
 
 const content = document.createElement('div'); // You need to pop up the displayed content
 content.classList.add('content');
 content.innerHTML = "Hello Next-Popover";
 
+const mountContainer = document.querySelector('.mount-container'); // default: document.body
+
 const popover = new Popover({
-  mountContainer,
   trigger, // required
   content, // required
+  mountContainer,
   placement: Placement.Top, // Set the position of the popover
   emit: EmitType.Hover // Set to open the popover when the mouse hovers over the trigger
 });
@@ -90,38 +91,6 @@ You can write CSS styles like this:
 .fade-exit-active {
   transition: transform .1s ease, opacity .1s ease;
 }
-```
-
-### Arrow
-
-The arrow parameter allows you to add a custom arrow element.
-
-```js
-const arrow = document.createElement('div');
-arrow.classList.add('arrow');
-
-const popover = new Popover({
-  arrow
-});
-```
-
-```css
-.arrow {
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
-  background: #000;
-}
-```
-
-Alternatively, an arrow can be quickly created using the built-in `createArrow` function.
-
-```ts
-import Popover, { createArrow } from 'next-popover';
-
-const popover = new Popover({
-  arrow: createArrow({ background: '#000' })
-});
 ```
 
 ### Scroll
@@ -189,7 +158,7 @@ canvas.on('scroll', () => popover.onScroll());
 | Name | Type | Default | Description |
 | -- | -- | -- | -- |
 | `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `Required`. The trigger element |
-| `content` | `Element` | | `Required`. The content element to be popped up |
+| `content` | `Element \| string` | | `Required`. The content element to be popped up |
 | `mountContainer` | `HTMLElement` | `document.body` | Mount container for popover. |
 | `showArrow` | `Boolean` | `true` | Whether to show arrow |
 | `arrow` | `Element` | | The arrow element. |
@@ -219,10 +188,11 @@ canvas.on('scroll', () => popover.onScroll());
 
 | Name | Type | Description |
 | -- | -- | -- |
-| `el` | `HTMLElement` | The popover element |
 | `config` | `PopoverConfig` | Popover configuration object |
+| `originalElement` | `HTMLElement` | The popover outer element |
+| `popoverWrapper` | `HTMLElement` | The popover wrapper element |
+| `arrowElement` | `HTMLElement` | The popover arrow element |
 | `opened` | `boolean` | Indicates whether the popover is currently displayed |
-| `isAnimating` | `boolean` | Indicates whether a CSS animation is currently in progress |
 
 ### Methods
 
@@ -312,24 +282,4 @@ Manually update the position of the Popover instance.
 
 ```ts
 update(): void;
-```
-
-### Utils
-
-Popover also provides utility methods for quickly creating `arrow` elements.
-
-```ts
-import Popover, { createArrow } from 'next-popover'
-
-new Popover({
-  arrow: createArrow()
-})
-```
-
-#### createArrow()
-
-Quickly create `arrow` DOM elements that can accept CSS style objects and class names as parameters.
-
-```ts
-createArrow(style?: CSSStyleDeclaration, className?: string): HTMLElement;
 ```

@@ -28,17 +28,18 @@ npm i next-popover
 ```js
 import Popover, { Placement, EmitType } from 'next-popover'
 
-const mountContainer = document.querySelector('.mount-container'); // 默认: document.body
 const trigger = document.querySelector('.trigger'); 
 
 const content = document.createElement('div'); // 需要弹出显示的内容
 content.classList.add('content');
 content.innerHTML = "Hello Next-Popover";
 
+const mountContainer = document.querySelector('.mount-container'); // 默认: document.body
+
 const popover = new Popover({
-  mountContainer,
   trigger, // 必填
   content, // 必填
+  mountContainer,
   placement: Placement.Top, // 设置弹框位置
   emit: EmitType.Hover // 设置鼠标 hover 在 trigger 上时打开弹框
 });
@@ -91,38 +92,6 @@ Popover 会通过 `animationClass` 添加下面 6 个类。
 .fade-exit-active {
   transition: transform .1s ease, opacity .1s ease;
 }
-```
-
-### 箭头
-
-通过 `arrow` 参数可以添加自定义箭头元素。
-
-```js
-const arrow = document.createElement('div');
-arrow.classList.add('arrow');
-
-const popover = new Popover({
-  arrow
-});
-```
-
-```css
-.arrow {
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
-  background: #000;
-}
-```
-
-或者通过内置的 `createArrow` 函数来快速创建 `arrow`。
-
-```ts
-import Popover, { createArrow } from 'next-popover';
-
-const popover = new Popover({
-  arrow: createArrow({ background: '#000' })
-});
 ```
 
 ### 滚动
@@ -190,7 +159,7 @@ canvas.on('scroll', () => popover.onScroll());
 | 参数 | 类型 | 默认 | 描述 |
 | -- | -- | -- | -- |
 | `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `必需`，触发元素 |
-| `content` | `Element` | | `必需`，要弹出的内容元素 |
+| `content` | `Element \| string` | | `必需`，要弹出的内容元素 |
 | `mountContainer` | `HTMLElement` | `document.body` | 弹出层的挂载容器 |
 | `showArrow` | `Boolean` | `true` | 是否显示箭头元素 |
 | `arrow` | `Element` | | 箭头元素 |
@@ -220,10 +189,11 @@ canvas.on('scroll', () => popover.onScroll());
 
 | 参数 | 类型 | 描述 |
 | -- | -- | -- |
-| `el` | `HTMLElement` | 弹出层元素 |
 | `config` | `PopoverConfig` | Popover 配置参数 |
+| `originalElement` | `HTMLElement` | 弹出层外层元素元素 |
+| `popoverWrapper` | `HTMLElement` | 弹出层元素 |
+| `arrowElement` | `HTMLElement` | 箭头元素 |
 | `opened` | `boolean` | 当前弹出层是否显示 |
-| `isAnimating` | `boolean` | 当前是否在进行 css 动画 |
 
 ### 方法
 
@@ -313,24 +283,4 @@ onScroll(): void;
 
 ```ts
 update(): void;
-```
-
-### 工具方法
-
-popover 还提供了快速创建 `arrow` 的工具方法。
-
-```ts
-import Popover, { createArrow } from 'next-popover';
-
-new Popover({
-  arrow: createArrow()
-});
-```
-
-#### createArrow()
-
-快速创建 `arrow` DOM 元素，可接受 css 样式对象和类名作为参数。
-
-```ts
-createArrow(style?: CSSStyleDeclaration, className?: string): HTMLElement;
 ```

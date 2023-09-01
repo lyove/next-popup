@@ -18,9 +18,11 @@ import {
   PopoverArrowClass,
   PopoverArrowInnerClass,
   EmitType,
-  PLACEMENT,
+  Placement,
 } from "./constant";
 import "./style.css";
+
+export { $, EmitType, Placement };
 
 /**
  * Popover
@@ -37,7 +39,7 @@ export default class Popover {
 
   /* private property */
   #defaultConfig: Partial<PopoverConfig> = {
-    placement: PLACEMENT.Top,
+    placement: Placement.Top,
     showArrow: true,
     mountContainer: document.body,
     autoUpdate: true,
@@ -57,7 +59,7 @@ export default class Popover {
   #resizeObserver?: ResizeObserver;
   #openTimer?: NodeJS.Timeout;
   #closeTimer?: NodeJS.Timeout;
-  #prevPlacement?: PLACEMENT;
+  #prevPlacement?: Placement;
 
   /**
    * Constructor
@@ -167,7 +169,7 @@ export default class Popover {
       triggerElement: config.trigger,
       popoverElement: this.originalElement,
       arrowElement: this.arrowElement,
-      placement: config.placement ? config.placement : PLACEMENT.Top,
+      placement: config.placement ? config.placement : Placement.Top,
     });
 
     const { placement, left: x, top: y, arrowLeft: arrowX, arrowTop: arrowY } = computedPosition;

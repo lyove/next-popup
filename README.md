@@ -205,7 +205,6 @@ canvas.on('scroll', () => popover.onScroll());
 | `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popover is opened. |
 | `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popover |
 | `closeOnScroll` | `boolean` | | Whether to automatically close the popover when the trigger element is scrolled. |
-<!-- | `hideOnInvisible` | `boolean` | | Whether to automatically hide the popover when the trigger element is invisible on the screen. | -->
 | `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popover coordinates | 
 | `closeAnimation` | `boolean` | `true` | Whether to animate when closing |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |

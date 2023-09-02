@@ -46,7 +46,8 @@ export default class Popover {
     clickOutsideClose: true,
     closeAnimation: true,
     enterable: true,
-    closeDelay: 0,
+    openDelay: 100,
+    closeDelay: 100,
   };
   #animationClass?: AnimationClass;
   #isAnimating = false;
@@ -611,14 +612,14 @@ export default class Popover {
     this.openWithDelay();
   };
 
-  #onTriggerLeave = (e: any) => {
+  #onTriggerLeave = ({ toElement }: any) => {
     const { trigger } = this.config;
     if (
       !this.opened ||
-      this.originalElement === e.toElement ||
-      this.originalElement.contains(e.toElement) ||
-      trigger === e.toElement ||
-      (trigger instanceof HTMLElement && trigger.contains(e.toElement))
+      this.originalElement === toElement ||
+      this.originalElement.contains(toElement) ||
+      trigger === toElement ||
+      (trigger instanceof HTMLElement && trigger.contains(toElement))
     ) {
       return;
     }
@@ -627,7 +628,6 @@ export default class Popover {
       this.closed = true;
     }
     this.closeWithDelay();
-    console.log(e);
   };
 
   #onDocClick = ({ target }: MouseEvent) => {
@@ -684,9 +684,8 @@ export default class Popover {
   #addEnterEvent() {
     const { enterable, emit } = this.config;
     if (enterable && emit === EmitType.Hover) {
-      // TODO: fix me
-      // this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
-      // this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
+      this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
+      this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
     }
   }
 

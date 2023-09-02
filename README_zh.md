@@ -168,7 +168,7 @@ canvas.on('scroll', () => popover.onScroll());
 | `animationClass` | `string` | | css 动画类名 |
 | `emit` | `EmitType` |  | 触发弹出类型 |
 | `clickOutsideClose` | `boolean` | `true` | 点击外部自动关闭弹出 |
-| `openDelay` | `number` | | 打开延迟 |
+| `openDelay` | `number` | `0` | 打开延迟 |
 | `closeDelay` | `number` | `50` | 关闭延迟 |
 | `open` | `boolean` | | 走来是否默认开启 |
 | `disabled` | `boolean` | | 是否禁用 |

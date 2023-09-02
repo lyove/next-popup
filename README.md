@@ -167,7 +167,7 @@ canvas.on('scroll', () => popover.onScroll());
 | `animationClass` | `string` | | The CSS animation class name. |
 | `emit` | `EmitType` |  | Trigger emit type |
 | `clickOutsideClose` | `boolean` | `true` | Automatically close the popover when clicking outside |
-| `openDelay` | `number` | | Open delay |
+| `openDelay` | `number` | `0` | Open delay |
 | `closeDelay` | `number` | `50` | Close delay |
 | `open` | `boolean` | | Is it enabled by default |
 | `disabled` | `boolean` | | Disabled |

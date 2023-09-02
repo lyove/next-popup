@@ -9,13 +9,12 @@ import {
   destroy,
   throttle,
   getChangedAttrs,
-  guid,
 } from "./utils";
 import {
   NextPopoverId,
-  PopoverWrapperClass,
-  PopoverContentClass,
-  PopoverArrowClass,
+  WrapperClassName,
+  ContentClassName,
+  ArrowClass,
   EmitType,
   Placement,
 } from "./constant";
@@ -30,8 +29,9 @@ export { $, EmitType, Placement };
 export default class Popover {
   /* public property */
   config!: PopoverConfig;
-  originalElement!: HTMLElement;
+  origin!: HTMLElement;
   popoverWrapper!: HTMLElement;
+  popoverContent!: HTMLElement;
   arrowElement?: HTMLElement;
   opened = false;
   closed = true;
@@ -167,7 +167,7 @@ export default class Popover {
 
     const computedPosition = getPosition({
       triggerElement: config.trigger,
-      popoverElement: this.originalElement,
+      popoverElement: this.origin,
       arrowElement: this.arrowElement,
       placement: config.placement ? config.placement : Placement.Top,
       margin: 8,
@@ -186,8 +186,8 @@ export default class Popover {
       this.#prevPlacement = placement;
     }
 
-    $showDomElement(this.originalElement);
-    $setStyle(this.originalElement, { transform: `translate3d(${x}px,${y}px,0)` });
+    $showDomElement(this.origin);
+    $setStyle(this.origin, { transform: `translate3d(${x}px,${y}px,0)` });
 
     if (config.showArrow && this.arrowElement) {
       $setStyle(this.arrowElement, { transform: `translate(${arrowX}px,${arrowY}px)` });
@@ -298,9 +298,11 @@ export default class Popover {
       // k: key, n: new,  o：old
       switch (k) {
         case "content":
-          this.popoverWrapper.removeChild(o as HTMLElement);
-          if (n) {
-            this.popoverWrapper.appendChild(n as HTMLElement);
+          this.popoverContent.removeChild(o as HTMLElement);
+          if (n instanceof HTMLElement) {
+            this.popoverContent.appendChild(n);
+          } else {
+            this.popoverContent.innerHTML = (n || "").toString();
           }
           break;
 
@@ -470,10 +472,10 @@ export default class Popover {
       this.#resizeObserver = undefined;
     }
     if (this.opened) {
-      if (mountContainer?.contains(this.originalElement)) {
-        mountContainer?.removeChild(this.originalElement);
+      if (mountContainer?.contains(this.origin)) {
+        mountContainer?.removeChild(this.origin);
       }
-      $setStyle(this.originalElement, { transform: "" });
+      $setStyle(this.origin, { transform: "" });
     }
 
     cancelAnimationFrame(this.#showRaf!);
@@ -495,7 +497,7 @@ export default class Popover {
    * Remove existing popovers
    */
   cleanup() {
-    $removeElements(document.querySelectorAll(`.${NextPopoverId}`));
+    $removeElements(document.querySelectorAll(`#${NextPopoverId}`));
   }
 
   /**
@@ -516,11 +518,10 @@ export default class Popover {
     const { content, mountContainer, wrapperClass, showArrow } = this.config;
 
     // Positioning Element
-    this.originalElement = $({
+    this.origin = $({
       tagName: "div",
       attributes: {
-        class: NextPopoverId,
-        id: `popover-${guid()}`,
+        id: NextPopoverId,
       },
     });
 
@@ -528,55 +529,54 @@ export default class Popover {
     this.popoverWrapper = $({
       tagName: "div",
       attributes: {
-        class: `${PopoverWrapperClass}${wrapperClass ? ` ${wrapperClass}` : ""}`,
+        class: `${WrapperClassName}${wrapperClass ? ` ${wrapperClass}` : ""}`,
       },
     });
-    this.originalElement.appendChild(this.popoverWrapper);
+    this.origin.appendChild(this.popoverWrapper);
 
     // Popover mounted elements
     if (mountContainer && mountContainer !== document.body) {
       $setStyle(mountContainer, { position: "relative" });
     }
 
-    // Popover content
-    if (content instanceof HTMLElement) {
-      content.classList.add(PopoverContentClass);
-      this.popoverWrapper.appendChild(content);
-    } else {
-      const newContent = $({
-        tagName: "div",
-        attributes: {
-          class: PopoverContentClass,
-        },
-        children: content.toString(),
-      });
-      this.popoverWrapper.appendChild(newContent);
-    }
-
     if (showArrow) {
       this.arrowElement = this.#createArrow();
       this.popoverWrapper.appendChild(this.arrowElement);
     }
+
+    // Popover content
+    this.popoverContent = $({
+      tagName: "div",
+      attributes: {
+        class: ContentClassName,
+      },
+    });
+    if (content instanceof HTMLElement) {
+      this.popoverContent.appendChild(content);
+    } else {
+      this.popoverContent.innerHTML = content.toString();
+    }
+    this.popoverWrapper.appendChild(this.popoverContent);
   }
 
   #createArrow() {
     return $({
       tagName: "div",
-      attributes: { class: PopoverArrowClass },
+      attributes: { class: ArrowClass },
     });
   }
 
   #show() {
     const { mountContainer } = this.config;
-    mountContainer!.appendChild(this.originalElement);
+    mountContainer!.appendChild(this.origin);
   }
 
   #hide() {
     const { mountContainer } = this.config;
-    if (mountContainer?.contains(this.originalElement)) {
-      mountContainer!.removeChild(this.originalElement);
+    if (mountContainer?.contains(this.origin)) {
+      mountContainer!.removeChild(this.origin);
     }
-    $setStyle(this.originalElement, { transform: "" });
+    $setStyle(this.origin, { transform: "" });
   }
 
   #setAnimationClass() {
@@ -674,14 +674,14 @@ export default class Popover {
   #addEnterEvent() {
     const { enterable, emit } = this.config;
     if (enterable && emit === EmitType.Hover) {
-      this.originalElement.addEventListener("mouseenter", this.#onTriggerEnter);
-      this.originalElement.addEventListener("mouseleave", this.#onTriggerLeave);
+      this.origin.addEventListener("mouseenter", this.#onTriggerEnter);
+      this.origin.addEventListener("mouseleave", this.#onTriggerLeave);
     }
   }
 
   #removeEnterEvent() {
-    this.originalElement.removeEventListener("mouseenter", this.#onTriggerEnter);
-    this.originalElement.removeEventListener("mouseleave", this.#onTriggerLeave);
+    this.origin.removeEventListener("mouseenter", this.#onTriggerEnter);
+    this.origin.removeEventListener("mouseleave", this.#onTriggerLeave);
   }
 
   #removeEmitEvent(element?: HTMLElement) {

@@ -160,23 +160,22 @@ canvas.on('scroll', () => popover.onScroll());
 | -- | -- | -- | -- |
 | `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `必需`，触发元素 |
 | `content` | `Element \| string` | | `必需`，要弹出的内容元素 |
+| `placement` | `Placement` | `Placement.Top` | 弹出层的位置 |
 | `mountContainer` | `HTMLElement` | `document.body` | 弹出层的挂载容器 |
 | `showArrow` | `Boolean` | `true` | 是否显示箭头元素 |
-| `arrow` | `Element` | | 箭头元素 |
-| `placement` | `Placement` | `Placement.Top` | 弹出层的位置 |
-| `autoUpdate` | `boolean` | `true` | 容器，内容，触发元素大小变化自动更新位置 |
-| `animationClass` | `string` | | css 动画类名 |
 | `emit` | `EmitType` |  | 触发弹出类型 |
-| `clickOutsideClose` | `boolean` | `true` | 点击外部自动关闭弹出 |
+| `autoUpdate` | `boolean` | `true` | 容器，内容，触发元素大小变化自动更新位置 |
+| `open` | `boolean` | | 走来是否默认开启 |
 | `openDelay` | `number` | `0` | 打开延迟 |
 | `closeDelay` | `number` | `50` | 关闭延迟 |
-| `open` | `boolean` | | 走来是否默认开启 |
-| `disabled` | `boolean` | | 是否禁用 |
-| `triggerOpenClass` | `string` | | 弹窗开启时给 `trigger` 添加的 `class` |
 | `enterable` | `boolean` | `true` | 当 `emit` 等于 `hover` 时，鼠标是否可进入弹出层 |
+| `disabled` | `boolean` | | 是否禁用 |
+| `clickOutsideClose` | `boolean` | `true` | 点击外部自动关闭弹出 |
 | `closeOnScroll` | `boolean` | | 是否在滚动时自动关闭 |
-| `useTriggerPos` | `boolean` | | 使用 `trigger` 参数返回的 `left` 和 `top` 作为弹框坐标 |
 | `closeAnimation` | `boolean` | `true` | 是否需要关闭动画 |
+| `triggerOpenClass` | `string` | | 弹窗开启时给 `trigger` 添加的 `class` |
+| `wrapperClass` | `string` | | `popoverWrapper` 自定义class |
+| `animationClass` | `string` | | css 动画类名 |
 | `onBeforeEnter` | `() => void` | | css 进入动画开始之前 |
 | `onEntered` | `() => void` | | css 进入动画完成时 |
 | `onBeforeExit` | `() => void` | | css 关闭动画开始之前 |
@@ -190,8 +189,9 @@ canvas.on('scroll', () => popover.onScroll());
 | 参数 | 类型 | 描述 |
 | -- | -- | -- |
 | `config` | `PopoverConfig` | Popover 配置参数 |
-| `originalElement` | `HTMLElement` | 弹出层外层元素元素 |
+| `origin` | `HTMLElement` | 弹出层外层元素元素 |
 | `popoverWrapper` | `HTMLElement` | 弹出层元素 |
+| `popoverContent` | `HTMLElement` | 弹出层内容元素 |
 | `arrowElement` | `HTMLElement` | 箭头元素 |
 | `opened` | `boolean` | 当前弹出层是否显示 |
 

@@ -159,23 +159,22 @@ canvas.on('scroll', () => popover.onScroll());
 | -- | -- | -- | -- |
 | `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `Required`. The trigger element |
 | `content` | `Element \| string` | | `Required`. The content element to be popped up |
+| `placement` | `Placement` | `Placement.Top` | The placement of the popover. |
 | `mountContainer` | `HTMLElement` | `document.body` | Mount container for popover. |
 | `showArrow` | `Boolean` | `true` | Whether to show arrow |
-| `arrow` | `Element` | | The arrow element. |
-| `placement` | `Placement` | `Placement.Top` | The placement of the popover. |
-| `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the mount container, content, or trigger size changes. |
-| `animationClass` | `string` | | The CSS animation class name. |
 | `emit` | `EmitType` |  | Trigger emit type |
-| `clickOutsideClose` | `boolean` | `true` | Automatically close the popover when clicking outside |
+| `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the mount container, content, or trigger size changes. |
+| `open` | `boolean` | | Is it enabled by default |
 | `openDelay` | `number` | `0` | Open delay |
 | `closeDelay` | `number` | `50` | Close delay |
-| `open` | `boolean` | | Is it enabled by default |
-| `disabled` | `boolean` | | Disabled |
-| `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popover is opened. |
 | `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popover |
+| `disabled` | `boolean` | | Disabled |
+| `clickOutsideClose` | `boolean` | `true` | Automatically close the popover when clicking outside |
 | `closeOnScroll` | `boolean` | | Whether to automatically close the popover when the trigger element is scrolled. |
-| `useTriggerPos` | `boolean` | | Use the `left` and `top` returned by the `trigger` parameter as the popover coordinates | 
 | `closeAnimation` | `boolean` | `true` | Whether to animate when closing |
+| `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popover is opened. |
+| `wrapperClass` | `string` | | The `class` added to the `popoverWrapper`. |
+| `animationClass` | `string` | | The CSS animation class name. |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
 | `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |
@@ -189,8 +188,9 @@ canvas.on('scroll', () => popover.onScroll());
 | Name | Type | Description |
 | -- | -- | -- |
 | `config` | `PopoverConfig` | Popover configuration object |
-| `originalElement` | `HTMLElement` | The popover outer element |
+| `origin` | `HTMLElement` | The popover outer element |
 | `popoverWrapper` | `HTMLElement` | The popover wrapper element |
+| `popoverContent` | `HTMLElement` | The popover Content element |
 | `arrowElement` | `HTMLElement` | The popover arrow element |
 | `opened` | `boolean` | Indicates whether the popover is currently displayed |
 

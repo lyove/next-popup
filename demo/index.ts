@@ -4,7 +4,11 @@ window.onload = function () {
   const mountElement = (document.querySelector(".mount-container") || document.body) as HTMLElement;
   const scrollBox = document.querySelector(".scroll-box") as HTMLElement;
   const trigger = document.querySelector("#trigger") as HTMLElement;
-  const content = $({ tagName: "div", children: "Next-Popover" });
+  const content = $({
+    tagName: "div",
+    attributes: { class: "content-inner" },
+    children: "Next-Popover",
+  });
 
   const mountedRect = mountElement.getBoundingClientRect();
   if (scrollBox) {
@@ -33,7 +37,12 @@ window.onload = function () {
   });
 
   // trigger.onclick = () => {
-  //   singlePopover.toggle();
+  //   setTimeout(() => {
+  //     singlePopover.updateConfig({
+  //       ...singleConfig,
+  //       content: "new content",
+  //     });
+  //   }, 300);
   // };
 
   // configure

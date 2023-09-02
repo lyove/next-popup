@@ -68,15 +68,3 @@ export function getChangedAttrs<T extends Record<string, any>>(
 export function clamp(n: number, lower = 0, upper = 1): number {
   return Math.max(Math.min(n, upper), lower);
 }
-
-/**
- * Globally Unique Identifier
- * @returns {string}
- */
-export function guid(): string {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}

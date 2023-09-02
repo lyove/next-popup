@@ -191,7 +191,7 @@ header span {
 }
 
 .popover-base-box .inbox {
-  padding: 200px 160px 200px;
+  padding: 100px 160px 100px;
   border-radius: 6px;
   background: #fff;
   box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
@@ -233,22 +233,6 @@ header span {
   border-radius: 4px;
 }
 
-.ml-3 {
-  margin-left: 0.75rem;
-}
-
-.mr-3 {
-  margin-right: 0.75rem;
-}
-
-.mt-3 {
-  margin-top: 0.75rem;
-}
-
-.mb-3 {
-  margin-bottom: 0.75rem;
-}
-
 /**
  * mount-container
  =====================================*/
@@ -267,12 +251,8 @@ header span {
 /**
  * Popover style
  */
-.popover-wrapper.test-popover {
-  position: relative;
-}
-
 /* content */
-.popover-wrapper.test-popover .popover-content {
+.popover-wrapper.single-popover .popover-content {
   width: 100px;
   height: 150px;
   display: flex;
@@ -280,14 +260,20 @@ header span {
   justify-content: center;
 }
 
-/* animation */
-.fade-enter-from,
-.fade-exit-to {
-  opacity: 0;
-  transform: scale(0.7);
+/* common */
+.ml-3 {
+  margin-left: 0.75rem;
 }
 
-.fade-enter-active,
-.fade-exit-active {
-  transition: transform 0.2s cubic-bezier(0.34, 0.69, 0.1, 1), opacity 0.2s ease;
+.mr-3 {
+  margin-right: 0.75rem;
 }
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+

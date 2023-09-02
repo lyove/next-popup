@@ -17,7 +17,7 @@ window.onload = function () {
     // mountContainer: mountElement,
     content,
     trigger: trigger,
-    wrapperClass: "test-popover",
+    wrapperClass: "single-popover",
     showArrow: true,
     autoUpdate: true,
     animationClass: "fade",
@@ -106,7 +106,6 @@ window.onload = function () {
   const multiConfig = {
     mountContainer: document.body,
     content: "Next-Popover",
-    wrapperClass: "test-popover",
     animationClass: "fade",
     placement: Placement.Top,
     emit: EmitType.Hover,

@@ -612,17 +612,7 @@ export default class Popover {
     this.openWithDelay();
   };
 
-  #onTriggerLeave = ({ toElement }: any) => {
-    const { trigger } = this.config;
-    if (
-      !this.opened ||
-      this.originalElement === toElement ||
-      this.originalElement.contains(toElement) ||
-      trigger === toElement ||
-      (trigger instanceof HTMLElement && trigger.contains(toElement))
-    ) {
-      return;
-    }
+  #onTriggerLeave = () => {
     this.#clearTimers();
     if (this.#isAnimating) {
       this.closed = true;

@@ -15,9 +15,12 @@ or via CDN
 
 ```html
 <link rel="stylesheet" href="https://unpkg.com/next-popover@latest/dist/style.css">
-<script src="https://unpkg.com/next-popover@latest/dist/popover.iife.js"></script>
+<script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
 <script>
-  new NextPopover({
+  const { NextPopover } = window;
+  const { PlacementType, EmitType } = NextPopover;
+  // use `NextPopover.default`
+  new NextPopover.default({
     // config
   });
 </script>
@@ -26,7 +29,7 @@ or via CDN
 ## Usage
 
 ```js
-import Popover, { Placement, EmitType } from 'next-popover'
+import Popover, { PlacementType, EmitType } from 'next-popover'
 
 const trigger = document.querySelector('.trigger'); 
 
@@ -40,7 +43,7 @@ const popover = new Popover({
   trigger, // required
   content, // required
   mountContainer,
-  placement: Placement.Top, // Set the position of the popover
+  placement: PlacementType.Top, // Set the position of the popover
   emit: EmitType.Hover // Set to open the popover when the mouse hovers over the trigger
 });
 
@@ -160,7 +163,7 @@ canvas.on('scroll', () => popover.onScroll());
 | -- | -- | -- | -- |
 | `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `Required`. The trigger element |
 | `content` | `Element \| string` | | `Required`. The content element to be popped up |
-| `placement` | `Placement` | `Placement.Top` | The placement of the popover. |
+| `placement` | `PlacementType` | `PlacementType.Top` | The placement of the popover. |
 | `mountContainer` | `HTMLElement` | `document.body` | Mount container for popover. |
 | `showArrow` | `Boolean` | `true` | Whether to show arrow |
 | `emit` | `EmitType` |  | Trigger emit type |

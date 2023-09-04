@@ -1,6 +1,7 @@
 # next-popover
 
 Next-Popover is a lightWeight and powerful popover plugin with vanillaJS. Simple, modern, and highly customizable.
+
 [中文文档](./README_zh.md)
 
 [![Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/next-popover-vywrrk)

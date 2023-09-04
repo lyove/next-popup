@@ -1,5 +1,5 @@
 /**
- * create dom element
+ * Create dom element
  * @param param
  * @returns HTMLElement
  */
@@ -49,27 +49,15 @@ export function $<T extends HTMLElement>({
 }
 
 /**
- * remove dom children element
- * @param dom
+ * Clear all child elements of an element
+ * @param $element
  */
-export function $clearChildren(dom: Element) {
-  while (dom.firstChild) {
-    if (dom.lastChild) {
-      dom.removeChild(dom.lastChild);
+export function $clearChildren($element: Element) {
+  while ($element.firstChild) {
+    if ($element.lastChild) {
+      $element.removeChild($element.lastChild);
     }
   }
-}
-
-/**
- * remove dom NodeList
- * @param $elements
- */
-export function $removeElements($elements: NodeList) {
-  Array.from($elements).forEach((element) => {
-    if (element.parentElement) {
-      element.parentElement?.removeChild(element);
-    }
-  });
 }
 
 /**
@@ -135,4 +123,36 @@ export function $setData($element: HTMLElement, data: { [key: string]: any }) {
 export function $getStyleProperties($element: HTMLElement, key: string) {
   const styles = window.getComputedStyle($element);
   return (styles as any)[key]?.split(", ");
+}
+
+/**
+ * get absolute coords of the element
+ * @param $element HTMLElement
+ * @returns object
+ */
+export function $getAbsoluteCoords($element: HTMLElement) {
+  if (!$element) {
+    return;
+  }
+
+  const boxRect = $element.getBoundingClientRect();
+
+  const pageX =
+    window.scrollX !== undefined
+      ? window.scrollX
+      : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
+
+  const pageY =
+    window.scrollY !== undefined
+      ? window.scrollY
+      : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+  return {
+    width: boxRect.width,
+    height: boxRect.height,
+    top: boxRect.top + pageY,
+    right: boxRect.right + pageX,
+    bottom: boxRect.bottom + pageY,
+    left: boxRect.left + pageX,
+  };
 }

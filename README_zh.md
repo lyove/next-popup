@@ -3,8 +3,9 @@
 
 Next-Popover 是一个体积小，功能轻大的弹出工具库，它可以自动定位到 Trigger 附近合适的位置。同时它还支持虚拟元素，可以在 canvas 元素中使用，和 CSS 类动画。
 
-
 [English](./README_zh.md)
+
+[![Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/next-popover-vywrrk)
 
 ## 安装
 

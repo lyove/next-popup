@@ -15,6 +15,7 @@ npm i next-popover
 或者通过 CDN 使用
 
 ```html
+<link rel="stylesheet" href="https://unpkg.com/next-popover@latest/dist/style.css">
 <script src="https://unpkg.com/next-popover@latest/dist/popover.iife.js"></script>
 <script>
   new NextPopover({

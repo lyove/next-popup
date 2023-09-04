@@ -1,6 +1,6 @@
 # next-popover
 
-Next-Popover is a smart popover library that can automatically pop up at a suitable position adjacent to the trigger.
+Next-Popover is a lightWeight and powerful popover plugin with vanillaJS. Simple, modern, and highly customizable.
 
 
 [中文文档](./README_zh.md)

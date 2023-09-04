@@ -1,11 +1,3 @@
-export const NextPopoverId = "next-popover";
-
-export const WrapperClassName = "popover-wrapper";
-
-export const ContentClassName = "popover-content";
-
-export const ArrowClass = "popover-arrow";
-
 export enum Placement {
   "Top" = "top",
   "TopStart" = "top-start",

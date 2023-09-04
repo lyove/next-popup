@@ -1,4 +1,5 @@
-import Popover, { $, Placement, EmitType } from "../src";
+import Popover, { Placement, EmitType } from "../src";
+import { $ } from "../src/utils";
 
 window.onload = function () {
   const mountElement = (document.querySelector(".mount-container") || document.body) as HTMLElement;

@@ -1,4 +1,4 @@
-import Popover, { Placement, EmitType } from "../src";
+import Popover, { PlacementType, EmitType } from "../src";
 import { $ } from "../src/utils";
 
 window.onload = function () {
@@ -26,7 +26,7 @@ window.onload = function () {
     showArrow: true,
     autoUpdate: true,
     animationClass: "fade",
-    placement: Placement.Top,
+    placement: PlacementType.Top,
     openDelay: 0,
     closeDelay: 50,
     emit: EmitType.Click,
@@ -105,6 +105,12 @@ window.onload = function () {
     }
   };
 
+  // Destroy
+  const destroyBtn = document.getElementById("destroy") as HTMLElement;
+  destroyBtn.onclick = () => {
+    singlePopover.destroy();
+  };
+
   /**
    * multiple placement example
    * ============================================================================================== //
@@ -117,7 +123,7 @@ window.onload = function () {
     mountContainer: document.body,
     content: "Next-Popover",
     animationClass: "fade",
-    placement: Placement.Top,
+    placement: PlacementType.Top,
     emit: EmitType.Hover,
     open: false,
   };
@@ -126,7 +132,7 @@ window.onload = function () {
     const p = new Popover({
       ...multiConfig,
       trigger: item,
-      placement: item.dataset.placement as Placement,
+      placement: item.dataset.placement as any,
     });
     multiPopovers.push(p);
   });

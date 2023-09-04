@@ -1,4 +1,4 @@
-export enum Placement {
+export enum PlacementType {
   "Top" = "top",
   "TopStart" = "top-start",
   "TopEnd" = "top-end",

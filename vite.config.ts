@@ -56,6 +56,11 @@ export default defineConfig(({ command, mode }) => {
         formats: ["es", "umd", "iife"],
         fileName: (format) => fileName[format],
       },
+      rollupOptions: {
+        output: {
+          exports: "named",
+        },
+      },
       copyPublicDir: false,
     },
     plugins: [banner(pkgInfo), styleInject()],

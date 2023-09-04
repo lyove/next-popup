@@ -1,4 +1,4 @@
-import { $setStyle } from "./utils";
+import { $getAbsoluteCoords, $setStyle } from "./utils";
 
 // getm more visible sides
 const getMoreVisibleSides = ($element) => {
@@ -21,34 +21,6 @@ const getMoreVisibleSides = ($element) => {
   return {
     horizontal,
     vertical,
-  };
-};
-
-// get absolute coords of the element
-const getAbsoluteCoords = ($element) => {
-  if (!$element) {
-    return;
-  }
-
-  const boxRect = $element.getBoundingClientRect();
-
-  const pageX =
-    window.scrollX !== undefined
-      ? window.scrollX
-      : (document.documentElement || document.body.parentNode || document.body).scrollLeft;
-
-  const pageY =
-    window.scrollY !== undefined
-      ? window.scrollY
-      : (document.documentElement || document.body.parentNode || document.body).scrollTop;
-
-  return {
-    width: boxRect.width,
-    height: boxRect.height,
-    top: boxRect.top + pageY,
-    right: boxRect.right + pageX,
-    bottom: boxRect.bottom + pageY,
-    left: boxRect.left + pageX,
   };
 };
 
@@ -82,7 +54,7 @@ export default function getPosition({
   });
 
   // popover Rect
-  const popoverElementCoords = getAbsoluteCoords(popoverElement);
+  const popoverElementCoords = $getAbsoluteCoords(popoverElement);
   const popoverElementWidth = popoverElementCoords.width;
   const popoverElementHeight = popoverElementCoords.height;
   const popoverElementTop = popoverElementCoords.top;
@@ -91,7 +63,7 @@ export default function getPosition({
   const popoverElementLeft = popoverElementCoords.left;
 
   // trigger Rect
-  const triggerElementCoords = getAbsoluteCoords(triggerElement);
+  const triggerElementCoords = $getAbsoluteCoords(triggerElement);
   const triggerElementWidth = triggerElementCoords.width;
   const triggerElementHeight = triggerElementCoords.height;
   const triggerElementTop = triggerElementCoords.top;

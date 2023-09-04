@@ -57,8 +57,8 @@ export default class Popover {
   #clearHide?: () => void;
   #scrollElements?: HTMLElement[];
   #resizeObserver?: ResizeObserver;
-  #openTimer?: NodeJS.Timeout;
-  #closeTimer?: NodeJS.Timeout;
+  #openTimer?: any;
+  #closeTimer?: any;
   #prevPlacement?: Placement;
 
   /**

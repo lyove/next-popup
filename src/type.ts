@@ -1,5 +1,12 @@
 import type { EmitType, Placement } from "./constant";
 
+type RectInfo = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
 export interface PopoverConfig {
   trigger: HTMLElement | { getBoundingClientRect: () => RectInfo };
   content: Node | string;
@@ -27,13 +34,6 @@ export interface PopoverConfig {
   onClose?: () => void;
   onClickOutside?: () => void;
 }
-
-export type RectInfo = {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-};
 
 export interface AnimationClass {
   enterFrom: string;

@@ -15,20 +15,12 @@ npm i next-popover
 或者通过 CDN 使用
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/next-popover@latest/dist/style.css">
 <script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
-<script>
-  const { NextPopover } = window;
-  const { PlacementType, EmitType } = NextPopover;
-  // 注意要使用 `NextPopover.default`
-  new NextPopover.default({
-    // config
-  });
-</script>
 ```
 
 ## 快速开始
 
+- ES6使用方式
 ```js
 import Popover, { PlacementType, EmitType } from 'next-popover'
 
@@ -60,6 +52,23 @@ trigger.onclick = () => {
 
 // 销毁 popover
 popover.destroy();
+```
+
+- 引用CDN链接方式使用
+
+```html
+<link rel="stylesheet" href="https://unpkg.com/next-popover@latest/dist/style.css">
+<script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
+```
+```js
+<script>
+  const { NextPopover } = window;
+  const { PlacementType, EmitType } = NextPopover;
+  // 注意这里使用 `NextPopover.default`
+  new NextPopover.default({
+    // config
+  });
+</script>
 ```
 
 ### CSS 动画

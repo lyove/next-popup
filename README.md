@@ -14,20 +14,12 @@ npm i next-popover
 or via CDN
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/next-popover@latest/dist/style.css">
 <script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
-<script>
-  const { NextPopover } = window;
-  const { PlacementType, EmitType } = NextPopover;
-  // use `NextPopover.default`
-  new NextPopover.default({
-    // config
-  });
-</script>
 ```
 
 ## Usage
 
+- ES6 usage
 ```js
 import Popover, { PlacementType, EmitType } from 'next-popover'
 
@@ -59,6 +51,22 @@ trigger.onclick = () => {
 
 // if you don't need it anymore
 popover.destroy();
+```
+
+- CDN usage
+```html
+<link rel="stylesheet" href="https://unpkg.com/next-popover@latest/dist/style.css">
+<script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
+```
+```js
+<script>
+  const { NextPopover } = window;
+  const { PlacementType, EmitType } = NextPopover;
+  // use `NextPopover.default`
+  new NextPopover.default({
+    // config
+  });
+</script>
 ```
 
 ### CSS Animation

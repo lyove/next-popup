@@ -1,4 +1,4 @@
-const outputName = "popover";
+const outputName = "popup";
 
 const config = {
   compilationOptions: {

@@ -1,28 +1,24 @@
 import type { EmitType, PlacementType } from "./constant";
 
-type RectInfo = {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-};
+export type RequireOneKey<T, K extends keyof T> = {
+  [P in K]-?: T[P];
+} & Omit<T, K>;
 
-export interface PopoverConfig {
-  trigger: HTMLElement | { getBoundingClientRect: () => RectInfo };
-  content: Node | string;
-  placement?: PlacementType;
-  mountContainer?: HTMLElement;
+export interface PopupConfig {
+  trigger: HTMLElement;
+  content: HTMLElement | string | number;
+  placement?: `${PlacementType}`;
   showArrow?: boolean;
-  emit?: EmitType;
-  autoUpdate?: boolean;
-  open?: boolean;
+  appendTo?: HTMLElement;
+  emit?: `${EmitType}`;
+  defaultOpen?: boolean;
   openDelay?: number;
   closeDelay?: number;
+  margin?: number;
   enterable?: boolean;
   disabled?: boolean;
   clickOutsideClose?: boolean;
   closeOnScroll?: boolean;
-  closeAnimation?: boolean;
   triggerOpenClass?: string;
   wrapperClass?: string;
   animationClass?: string;
@@ -32,7 +28,6 @@ export interface PopoverConfig {
   onExited?: () => void;
   onOpen?: () => void;
   onClose?: () => void;
-  onClickOutside?: () => void;
 }
 
 export interface AnimationClass {

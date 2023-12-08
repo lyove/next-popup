@@ -184,13 +184,13 @@ header span {
   background: #2547cf;
 }
 
-/* popover-base-box */
-.popover-base-box {
+/* popup-base-box */
+.popup-base-box {
   width: 800px;
   margin: 48px auto 24px;
 }
 
-.popover-base-box .inbox {
+.popup-base-box .inbox {
   padding: 100px 160px 100px;
   border-radius: 6px;
   background: #fff;
@@ -198,17 +198,17 @@ header span {
     rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
 }
 
-.popover-base-box .row {
+.popup-base-box .row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.popover-base-box .center {
+.popup-base-box .center {
   justify-content: center;
 }
 
-.popover-base-box .box-item {
+.popup-base-box .box-item {
   width: 110px;
   margin-top: 10px;
 }
@@ -249,10 +249,10 @@ header span {
 }
 
 /**
- * Popover style
+ * Popup style
  */
 /* content */
-.popover-wrapper.single-popover .popover-content {
+.popup-wrapper.single-popup .popup-content {
   width: 100px;
   height: 150px;
   display: flex;

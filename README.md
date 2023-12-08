@@ -1,86 +1,96 @@
-# next-popover
+# next-popup
 
-Next-Popover is a lightWeight and powerful popover plugin with vanillaJS. Simple, modern, and highly customizable.
+<a href="https://github.com/lyove/next-popup/stargazers"><img src="https://img.shields.io/github/stars/lyove/next-popup" alt="Stars Badge"/></a>
+<a href="https://github.com/lyove/next-popup/network/members"><img src="https://img.shields.io/github/forks/lyove/next-popup" alt="Forks Badge"/></a>
+<a href="https://github.com/lyove/next-popup/pulls"><img src="https://img.shields.io/github/issues-pr/lyove/next-popup" alt="Pull Requests Badge"/></a>
+<a href="https://github.com/lyove/next-popup/issues"><img src="https://img.shields.io/github/issues/lyove/next-popup" alt="Issues Badge"/></a>
+<a href="https://github.com/lyove/next-popup/graphs/contributors"><img src="https://img.shields.io/github/contributors/lyove/next-popup?color=2b9348" alt="GitHub contributors"></a>
+<a href="https://github.com/lyove/next-popup/blob/master/LICENSE"><img src="https://img.shields.io/github/license/lyove/next-popup?color=2b9348" alt="License Badge"/></a>
+
+![Header Image](public/Popup.png)
+
+Next-Popup is a lightweight and simple popup, tooltip, dropdown library, with no other dependencies, and Typescript friendly.
+
+[![Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/next-popup-vywrrk)
 
 [中文文档](./README_zh.md)
-
-[![Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/next-popover-vywrrk)
 
 ## Install
 
 ```
-npm i next-popover
+npm i next-popup
+```
+or
+```
+yarn add next-popup
+```
+or
+```
+pnpm add next-popup
 ```
 
 or via CDN
 
 ```html
-<script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
-```
-
-## Usage
-
-- ES6 usage
-```js
-import Popover, { PlacementType, EmitType } from 'next-popover'
-
-const trigger = document.querySelector('.trigger'); 
-
-const content = document.createElement('div'); // You need to pop up the displayed content
-content.classList.add('content');
-content.innerHTML = "Hello Next-Popover";
-
-const mountContainer = document.querySelector('.mount-container'); // default: document.body
-
-const popover = new Popover({
-  trigger, // required
-  content, // required
-  mountContainer,
-  placement: PlacementType.Top, // Set the position of the popover
-  emit: EmitType.Hover // Set to open the popover when the mouse hovers over the trigger
-});
-
-trigger.onclick = () => {
-  popover.toggle();
-  // or
-  // if (popover.opened) {
-  //   popover.close();
-  // } else {
-  //   popover.open();
-  // }
-}
-
-// if you don't need it anymore
-popover.destroy();
-```
-
-- CDN usage
-```html
-<link rel="stylesheet" href="https://unpkg.com/next-popover@latest/dist/style.css">
-<script src="https://unpkg.com/next-popover@latest/dist/popover.umd.js"></script>
-```
-```js
+<script src="https://unpkg.com/next-popup@latest/dist/popup.umd.js"></script>
 <script>
-  const { NextPopover } = window;
-  const { PlacementType, EmitType } = NextPopover;
-  // use `NextPopover.default`
-  new NextPopover.default({
+  const { NextPopup } = window;
+  const { PlacementType, EmitType } = NextPopup;
+  // use `NextPopup.default`
+  new NextPopup.default({
     // config
   });
 </script>
 ```
 
-### CSS Animation
-
-The animationClass parameter allows you to add CSS animations when showing and hiding the popover.
+## Usage
 
 ```js
-const popover = new Popover({
+import Popup, { PlacementType, EmitType } from 'next-popup'
+
+const trigger = document.querySelector('.trigger'); 
+
+const content = "Hello Next-Popup";
+// or
+// const content = document.createElement('div'); // You need to pop up the displayed content
+// content.classList.add('content');
+// content.innerHTML = "Hello Next-Popup";
+
+const appendTo = document.querySelector('.mount-container'); // default: document.body
+
+const popup = new Popup({
+  trigger, // required
+  content, // required
+  appendTo,
+  placement: "top", // Set the position of the popup
+  emit: "hover" // Set to open the popup when the mouse hovers over the trigger
+});
+
+trigger.onclick = () => {
+  popup.toggle();
+  // or
+  // if (popup.opened) {
+  //   popup.close();
+  // } else {
+  //   popup.open();
+  // }
+}
+
+// if you don't need it anymore
+popup.destroy();
+```
+
+### CSS Animation
+
+The animationClass parameter allows you to add CSS animations when showing and hiding the popup.
+
+```js
+const popup = new Popup({
   animationClass: 'fade'
 });
 ```
 
-Popover will add the following 6 classes through the animationClass.
+Popup will add the following 6 classes through the animationClass.
 
 ```js
 `${animationClass}-enter-from` // Starts displaying and is removed in the next frame.
@@ -89,7 +99,7 @@ Popover will add the following 6 classes through the animationClass.
 `${animationClass}-exit-from` // Starts hiding and is removed in the next frame.
 `${animationClass}-exit-active` // Added in the next frame and removed when the animation ends.
 `${animationClass}-exit-to` // Added in the next frame and removed when the animation ends.
-`${animationClass}-${Placement}` // Current popover placement
+`${animationClass}-${placement}` // Current popup placement
 ```
 
 You can write CSS styles like this:
@@ -108,20 +118,14 @@ You can write CSS styles like this:
 
 ### Scroll
 
-The closeOnScroll parameter controls whether the popover automatically closes when the trigger element is scrolled.
-
-<!-- The hideOnInvisible parameter controls whether the popover automatically hides when the trigger element is not visible on the screen. -->
-
-### AutoUpdate
-
-The autoUpdate parameter controls whether the popover's position is automatically updated when the size of the mount container, content, or trigger element changes. This feature relies on the [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver).
+The closeOnScroll parameter controls whether the popup automatically closes when the trigger element is scrolled.
 
 ### Hook
 
-Popover provides rich hook functions that can execute code during various stages of the popover's lifecycle.
+Popup provides rich hook functions that can execute code during various stages of the popup's lifecycle.
 
 ```js
-new Popover({
+new Popup({
   onBeforeEnter() {
     // Executed before the CSS display animation starts.
   },
@@ -135,33 +139,12 @@ new Popover({
     // Executed after the CSS hide animation completes.
   },
   onOpen() {
-    // Executed when the popover is displayed.
+    // Executed when the popup is displayed.
   },
   onClose() {
-    // Executed when the popover is closed.
+    // Executed when the popup is closed.
   }
 });
-```
-
-### Virtual Element
-
-The trigger parameter can be a virtual element in addition to a DOM element. This allows you to use Popover with canvas. When the canvas is scrolled, you can manually call the `popover.onScroll()` method to trigger the popover to scroll.
-
-```js
-const popover = new Popover({
-  trigger: {
-    getBoundingClientRect() {
-      return {
-        left: 0,
-        top: 0,
-        width: 0,
-        height: 0
-      }
-    }
-  }
-});
-
-canvas.on('scroll', () => popover.onScroll());
 ```
 
 ## API
@@ -170,48 +153,45 @@ canvas.on('scroll', () => popover.onScroll());
 
 | Name | Type | Default | Description |
 | -- | -- | -- | -- |
-| `trigger` | `Element \| { getBoundingClientRect: () => Rect }` | | `Required`. The trigger element |
-| `content` | `Element \| string` | | `Required`. The content element to be popped up |
-| `placement` | `PlacementType` | `PlacementType.Top` | The placement of the popover. |
-| `mountContainer` | `HTMLElement` | `document.body` | Mount container for popover. |
+| `trigger` | `HTMLElement ` | | `Required`. The trigger element |
+| `content` | `HTMLElement \| string \| number` | | `Required`. The content element to be popped up |
+| `appendTo` | `HTMLElement` | `document.body` | The element to append the popup to. |
+| `placement` | `top` `left` `right` `bottom` `top-left` `top-right` `bottom-left` `bottom-right` `left-top` `left-bottom` `right-top` `right-bottom` | `top` | The placement of the popup. |
 | `showArrow` | `Boolean` | `true` | Whether to show arrow |
-| `emit` | `EmitType` |  | Trigger emit type |
-| `autoUpdate` | `boolean` | `true` | Whether to automatically update the position when the mount container, content, or trigger size changes. |
-| `open` | `boolean` | | Is it enabled by default |
-| `openDelay` | `number` | `0` | Open delay |
-| `closeDelay` | `number` | `50` | Close delay |
-| `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popover |
+| `emit` | `click` or `hover` | `click` | Trigger emit type |
+| `open` | `boolean` |  | Whether to open the popup box by default |
+| `openDelay` | `number` | `100` | Open delay |
+| `closeDelay` | `number` | `100` | Close delay |
+| `enterable` | `boolean` | `true` | When `emit` is set to `hover`, can the mouse enter the popup |
 | `disabled` | `boolean` | | Disabled |
-| `clickOutsideClose` | `boolean` | `true` | Automatically close the popover when clicking outside |
-| `closeOnScroll` | `boolean` | | Whether to automatically close the popover when the trigger element is scrolled. |
-| `closeAnimation` | `boolean` | `true` | Whether to animate when closing |
-| `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popover is opened. |
-| `wrapperClass` | `string` | | The `class` added to the `popoverWrapper`. |
+| `clickOutsideClose` | `boolean` | `true` | Automatically close the popup when clicking outside |
+| `closeOnScroll` | `boolean` | | Whether to automatically close the popup when the trigger element is scrolled. |
+| `triggerOpenClass` | `string` | | The `class` added to the `trigger` when the popup is opened. |
+| `wrapperClass` | `string` | | The `class` added to the `popupWrapper`. |
 | `animationClass` | `string` | | The CSS animation class name. |
 | `onBeforeEnter` | `() => void` | | Called before the CSS enter animation starts. |
 | `onEntered` | `() => void` | | 	Called when the CSS enter animation ends. |
 | `onBeforeExit` | `() => void` | | Called before the CSS exit animation starts. |
 | `onExited` | `() => void` | | Called when the CSS exit animation ends. |
-| `onOpen` | `() => void` | | Called when the popover is opened. |
-| `onClose` | `() => void` | |Called when the popover is closed. |
-| `onClickOutside` | `() => void` | | When the popover is closed. |
+| `onOpen` | `() => void` | | Called when the popup is opened. |
+| `onClose` | `() => void` | |Called when the popup is closed. |
 
-### Property
+### Instance properties
 
 | Name | Type | Description |
 | -- | -- | -- |
-| `config` | `PopoverConfig` | Popover configuration object |
-| `origin` | `HTMLElement` | The popover outer element |
-| `popoverWrapper` | `HTMLElement` | The popover wrapper element |
-| `popoverContent` | `HTMLElement` | The popover Content element |
-| `arrowElement` | `HTMLElement` | The popover arrow element |
-| `opened` | `boolean` | Indicates whether the popover is currently displayed |
+| `config` | `PopupConfig` | Popup configuration object |
+| `popupRoot` | `HTMLElement` | The popup root element |
+| `popupWrapper` | `HTMLElement` | The popup wrapper element |
+| `popupContent` | `HTMLElement` | The popup Content element |
+| `arrowElement` | `HTMLElement` | The popup arrow element |
+| `opened` | `boolean` | Indicates whether the popup is currently displayed |
 
 ### Methods
 
 #### open()
 
-Open the Popover instance.
+Open the Popup instance.
 
 ```ts
 open(): void;
@@ -219,7 +199,7 @@ open(): void;
 
 #### close()
 
-Close the Popover instance.
+Close the Popup instance.
 
 ```ts
 close(): void;
@@ -227,7 +207,7 @@ close(): void;
 
 #### toggle()
 
-Toggle the Popover instance open or close.
+Toggle the Popup instance open or close.
 
 ```ts
 toggle(): void;
@@ -235,7 +215,7 @@ toggle(): void;
 
 #### openWithDelay()
 
-Open the popover after `config.openDelay` time.
+Open the popup after `config.openDelay` time.
 
 ```ts
 openWithDelay(): void;
@@ -243,7 +223,7 @@ openWithDelay(): void;
 
 #### closeWithDelay()
 
-Close the popover after `config.closeDelay` time.
+Close the popup after `config.closeDelay` time.
 
 ```ts
 closeWithDelay(): void;
@@ -259,7 +239,7 @@ enable(): void
 
 #### disable()
 
-Disable and close popover.
+Disable and close popup.
 
 ```ts
 disable(): void
@@ -270,12 +250,12 @@ disable(): void
 Update config.
 
 ```ts
-updateConfig(config: Partial<PopoverConfig>): void;
+updateConfig(config: Partial<PopupConfig>): void;
 ```
 
 #### destroy()
 
-Destroy the Popover instance.
+Destroy the Popup instance.
 
 ```ts
 destroy(): void;
@@ -283,7 +263,7 @@ destroy(): void;
 
 #### onScroll()
 
-Manually trigger the `onScroll` event. Generally only used when using a virtual element.
+Manually trigger the `onScroll` event.
 
 ```ts
 onScroll(): void;
@@ -291,7 +271,7 @@ onScroll(): void;
 
 #### update()
 
-Manually update the position of the Popover instance.
+Manually update the position of the Popup instance.
 
 ```ts
 update(): void;

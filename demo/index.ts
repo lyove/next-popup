@@ -1,4 +1,4 @@
-import Popover, { PlacementType, EmitType } from "../src";
+import Popup, { PlacementType, EmitType } from "../src";
 import { $ } from "../src/utils";
 
 window.onload = function () {
@@ -8,7 +8,7 @@ window.onload = function () {
   const content = $({
     tagName: "div",
     attributes: { class: "content-inner" },
-    children: "Next-Popover",
+    children: "Next-Popup",
   });
 
   const mountedRect = mountElement.getBoundingClientRect();
@@ -22,7 +22,7 @@ window.onload = function () {
     // mountContainer: mountElement,
     content,
     trigger: trigger,
-    wrapperClass: "single-popover",
+    wrapperClass: "single-popup",
     showArrow: true,
     autoUpdate: true,
     animationClass: "fade",
@@ -33,13 +33,13 @@ window.onload = function () {
     open: false,
   };
 
-  const singlePopover = new Popover({
+  const singlePopup = new Popup({
     ...singleConfig,
   });
 
   // trigger.onclick = () => {
   //   setTimeout(() => {
-  //     singlePopover.updateConfig({
+  //     singlePopup.updateConfig({
   //       ...singleConfig,
   //       content: "new content",
   //     });
@@ -53,7 +53,7 @@ window.onload = function () {
   configure.onchange = ({ target }) => {
     const { name, value, checked } = target as any;
     if (name === "placement") {
-      singlePopover.updateConfig({
+      singlePopup.updateConfig({
         ...singleConfig,
         placement: value,
       });
@@ -63,18 +63,18 @@ window.onload = function () {
       } else if (value === "click") {
         trigger.innerHTML = "Click Me";
       }
-      singlePopover.updateConfig({
+      singlePopup.updateConfig({
         ...singleConfig,
         emit: value,
       });
     } else if (name === "extra") {
       if (value === "css") {
-        singlePopover.updateConfig({
+        singlePopup.updateConfig({
           ...singleConfig,
           animationClass: checked ? "fade" : "",
         });
       } else {
-        singlePopover.updateConfig({
+        singlePopup.updateConfig({
           ...singleConfig,
           ...{ [singleConfig[value]]: checked },
         });
@@ -91,14 +91,14 @@ window.onload = function () {
     if (name === "openDelay") {
       openDelay.textContent = `${value}ms`;
       singleConfig.openDelay = Number(value);
-      singlePopover.updateConfig({
+      singlePopup.updateConfig({
         ...singleConfig,
         openDelay: Number(value),
       });
     } else if (name === "closeDelay") {
       closeDelay.textContent = `${value}ms`;
       singleConfig.closeDelay = Number(value);
-      singlePopover.updateConfig({
+      singlePopup.updateConfig({
         ...singleConfig,
         closeDelay: Number(value),
       });
@@ -108,20 +108,20 @@ window.onload = function () {
   // Destroy
   const destroyBtn = document.getElementById("destroy") as HTMLElement;
   destroyBtn.onclick = () => {
-    singlePopover.destroy();
+    singlePopup.destroy();
   };
 
   /**
    * multiple placement example
    * ============================================================================================== //
    */
-  const placementsItems = document.querySelectorAll(".popover_trigger") as NodeListOf<HTMLElement>;
+  const placementsItems = document.querySelectorAll(".popup_trigger") as NodeListOf<HTMLElement>;
 
-  const multiPopovers: any[] = [];
+  const multiPopups: any[] = [];
 
   const multiConfig = {
     mountContainer: document.body,
-    content: "Next-Popover",
+    content: "Next-Popup",
     animationClass: "fade",
     placement: PlacementType.Top,
     emit: EmitType.Hover,
@@ -129,11 +129,11 @@ window.onload = function () {
   };
 
   placementsItems.forEach((item) => {
-    const p = new Popover({
+    const p = new Popup({
       ...multiConfig,
       trigger: item,
       placement: item.dataset.placement as any,
     });
-    multiPopovers.push(p);
+    multiPopups.push(p);
   });
 };

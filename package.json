@@ -1,22 +1,22 @@
 {
-  "name": "next-popover",
-  "version": "0.0.0",
-  "description": "A lightweight smart javascript popup library",
+  "name": "next-popup",
+  "version": "0.0.1",
+  "description": "A lightweight and simple popup, tooltip, dropdown library, with no other dependencies, and Typescript friendly.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lyove/next-popover"
+    "url": "https://github.com/lyove/next-popup"
   },
-  "homepage": "https://github.com/lyove/next-popover#readme",
+  "homepage": "https://github.com/lyove/next-popup",
   "author": "lyove",
   "type": "module",
   "files": [
     "dist"
   ],
-  "main": "./dist/popover.es.js",
+  "main": "./dist/popup.es.js",
   "exports": {
     ".": {
-      "import": "./dist/popover.es.js",
-      "require": "./dist/popover.umd.js"
+      "import": "./dist/popup.es.js",
+      "require": "./dist/popup.umd.js"
     }
   },
   "publishConfig": {
@@ -25,11 +25,11 @@
   },
   "license": "MIT",
   "keywords": [
-    "popover",
-    "popover.js",
     "popup",
     "popup.js",
-    "next-popover",
+    "popup",
+    "popup.js",
+    "next-popup",
     "dropdown",
     "dialog",
     "overlay",
@@ -66,7 +66,7 @@
     "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4",
-    "vite": "^4.0.4",
+    "vite": "^4.5.0",
     "vite-plugin-banner": "^0.7.0",
     "vite-plugin-dts": "^2.3.0"
   },

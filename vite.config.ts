@@ -1,11 +1,11 @@
 import * as path from "path";
 import { defineConfig } from "vite";
 import banner from "vite-plugin-banner";
-import packageJson from "./package.json";
 import styleInject from "./plugins/style-inject";
+import packageJson from "./package.json";
 
 const packageName = packageJson.name;
-const outputName = "popover";
+const outputName = "popup";
 
 const getPascalCaseName = () => {
   try {
@@ -63,7 +63,7 @@ export default defineConfig(({ command, mode }) => {
       },
       copyPublicDir: false,
     },
-    plugins: [banner(pkgInfo), styleInject()],
+    plugins: [banner(pkgInfo), styleInject({ styleId: "next-popup-style" })],
     resolve: {
       alias: {
         "@/*": path.resolve(__dirname, "src"),

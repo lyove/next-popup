@@ -7,8 +7,6 @@
 <a href="https://github.com/lyove/next-popup/graphs/contributors"><img src="https://img.shields.io/github/contributors/lyove/next-popup?color=2b9348" alt="GitHub contributors"></a>
 <a href="https://github.com/lyove/next-popup/blob/master/LICENSE"><img src="https://img.shields.io/github/license/lyove/next-popup?color=2b9348" alt="License Badge"/></a>
 
-![Header Image](public/Popup.png)
-
 Next-Popup is a lightweight and simple popup, tooltip, dropdown library, with no other dependencies, and Typescript friendly.
 
 [![Demo](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/next-popup-vywrrk)
